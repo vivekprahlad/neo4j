@@ -63,7 +63,8 @@ module Neo4j
     #
     def initialize(*args)
       # was a neo java node provided ?
-      if args.length == 1 && args[0].kind_of?(org.neo4j.graphdb.Node)
+
+      if args.length == 1 && node_given?(args[0])
         # yes, it was loaded from the database
         init_with_node(args[0])
       elsif self.respond_to?(:init_node)
@@ -79,6 +80,14 @@ module Neo4j
       # must call super with no arguments so that chaining of the initialize method works
       super()
     end
+
+    def node_given?(node)
+      node.kind_of?(org.neo4j.graphdb.Node)
+    end if defined? JRUBY_VERSION
+
+    def node_given?(node)
+      node.respond_to?(:_classname) && node._classname == "org.neo4j.kernel.impl.core.NodeProxy"  # TODO ugly, must be a better way to make it similar to JRuby kind_of?
+    end unless defined? JRUBY_VERSION
 
 
     # Inits this node with the specified java neo node
@@ -203,11 +212,11 @@ module Neo4j
     def _to_java_direction(dir) # :nodoc:
       case dir
         when :outgoing
-          org.neo4j.graphdb.Direction::OUTGOING
+          Neo4j::OUTGOING
         when :incoming
-          org.neo4j.graphdb.Direction::INCOMING
+          Neo4j::INCOMING
         when :both
-          org.neo4j.graphdb.Direction::BOTH
+          Neo4j::BOTH
         else
           raise "Unknown parameter: '#{dir}', only accept :outgoing, :incoming or :both"
       end

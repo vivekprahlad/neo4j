@@ -57,7 +57,7 @@ module Neo4j
       def outgoing(*types)
         types.each do |type|
           @types_and_dirs << org.neo4j.graphdb.DynamicRelationshipType.withName(type.to_s)
-          @types_and_dirs << org.neo4j.graphdb.Direction::OUTGOING
+          @types_and_dirs << Neo4j::OUTGOING
         end
         self
       end
@@ -65,7 +65,7 @@ module Neo4j
       def incoming(*types)
         types.each do |type|
           @types_and_dirs << org.neo4j.graphdb.DynamicRelationshipType.withName(type.to_s)
-          @types_and_dirs << org.neo4j.graphdb.Direction::INCOMING
+          @types_and_dirs << Neo4j::INCOMING
         end
         self
       end
@@ -73,7 +73,7 @@ module Neo4j
       def both(*types)
         types.each do |type|
           @types_and_dirs << org.neo4j.graphdb.DynamicRelationshipType.withName(type.to_s)
-          @types_and_dirs << org.neo4j.graphdb.Direction::BOTH
+          @types_and_dirs << Neo4j::BOTH
         end
         self
       end

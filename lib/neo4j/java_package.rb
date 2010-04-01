@@ -14,11 +14,7 @@ module Kernel
      # check that it's not a jar file
     raise unless path =~ /\.jar/
 
-    # get the path from where it was required
-    local_path = File.expand_path(File.dirname(caller[0].sub(/:\d+:in.`.*?'/, '')))
-    load_paths = [local_path] + $LOAD_PATH[0...-1]
-    found_path = load_paths.find{|p| File.exist?(File.join(p,path))}
-    puts "FOUND PATH #{found_path}"
+    found_path = $LOAD_PATH.find{|p| File.exist?(File.join(p,path))}
     raise unless found_path
     
     abs_path = File.join(found_path, path)
@@ -26,20 +22,18 @@ module Kernel
     raise unless  File.exist?(abs_path)
 
     # try to load it using RJB
-    puts "ADD abs '#{abs_path}'"
-    @rjb_jars ||= []
-    @rjb_jars << abs_path unless @rjb_jars.include?(abs_path)
+    puts "REQUIRE JAR FILE at  '#{abs_path}'"
+    @@rjb_jars ||= []
+    @@rjb_jars << abs_path unless @@rjb_jars.include?(abs_path)
     # TODO
   end
 
   def load_jvm(jargs)
     classpath = ENV['CLASSPATH'] ||= ''
-    @rjb_jars.each do |jar|
+    @@rjb_jars.each do |jar|
       classpath += File::PATH_SEPARATOR unless classpath.empty?
       classpath += jar
     end
-#    classpath += File::PATH_SEPARATOR + File.join(libpath, 'neo4j-kernel-1.0.jar')
-#    classpath += File::PATH_SEPARATOR + File.join(libpath, 'geronimo-jta_1.1_spec-1.1.1.jar')
     puts "LOAD JVM WITH '#{classpath}'"
     Rjb::load(classpath, jargs)
   end
@@ -51,20 +45,15 @@ class JavaPackage
     @pack_name = pack_name
     @parent_pack = parent_pack
     @cache = {}
-    puts "Create pack #{pack_name}"
   end
 
   def method_missing(m, *args)
     # return if possible old module/class
-    puts "m=#{m} #{@cache[m]}"
     @cache[m] ||= create_package_or_class(m)
   end
-
   def create_package_or_class(m)
     method = m.to_s
-    puts "create package #{m}"
-    if upcase?(method)
-#      puts "Import #{self}.#{method}"
+    if class?(method)
       Rjb::import("#{self}.#{method}")
     else
       JavaPackage.new(method, self)
@@ -79,7 +68,7 @@ class JavaPackage
     end
   end
 
-  def upcase?(a)
+  def class?(a)
     first_letter = a[0]
     first_letter >= 65 && first_letter <= 90
   end

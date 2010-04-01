@@ -62,10 +62,10 @@ module Neo4j
       def swap_directions
         @types_and_dirs = @types_and_dirs.map do |item|
           case item
-          when org.neo4j.graphdb.Direction::INCOMING
-            org.neo4j.graphdb.Direction::OUTGOING
-          when org.neo4j.graphdb.Direction::OUTGOING
-            org.neo4j.graphdb.Direction::INCOMING
+          when Neo4j::INCOMING
+            Neo4j::OUTGOING
+          when Neo4j::OUTGOING
+            Neo4j::INCOMING
           else
             item
           end

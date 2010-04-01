@@ -100,11 +100,11 @@ module Neo4j::JavaNodeMixin
   def _to_java_direction(dir) # :nodoc:
     case dir
       when :outgoing
-        org.neo4j.graphdb.Direction::OUTGOING
+        Neo4j::OUTGOING
       when :incoming
-        org.neo4j.graphdb.Direction::INCOMING
+        Neo4j::INCOMING
       when :both
-        org.neo4j.graphdb.Direction::BOTH
+        Neo4j::BOTH
       else
         raise "Unknown parameter: '#{dir}', only accept :outgoing, :incoming or :both"
     end

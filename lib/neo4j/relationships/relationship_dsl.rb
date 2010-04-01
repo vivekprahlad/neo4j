@@ -30,13 +30,13 @@ module Neo4j
       
       def outgoing(type = nil)
         @type = type
-        @direction = org.neo4j.graphdb.Direction::OUTGOING
+        @direction = Neo4j::OUTGOING
         self
       end
 
       def incoming(type = nil)
         @type = type
-        @direction = org.neo4j.graphdb.Direction::INCOMING
+        @direction = Neo4j::INCOMING
         self
       end
 
@@ -47,7 +47,7 @@ module Neo4j
 
       def both(type = nil)
         @type = type
-        @direction = org.neo4j.graphdb.Direction::BOTH
+        @direction = Neo4j::BOTH
         self
       end
 
@@ -70,7 +70,8 @@ module Neo4j
       # :api: public
       def <<(other_node)
         source, target = @node, other_node
-        source, target = target, source if @direction == org.neo4j.graphdb.Direction::INCOMING
+        puts "Direction #@direction class #{@direction._classname}"
+        source, target = target, source if @direction == Neo4j::INCOMING
         source.add_rel(@type, target)
         self
       end

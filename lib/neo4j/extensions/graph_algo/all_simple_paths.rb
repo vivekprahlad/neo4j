@@ -61,7 +61,7 @@ module Neo4j::GraphAlgo
 
     def initialize
       @types = []
-      @direction = org.neo4j.graphdb.Direction::OUTGOING
+      @direction = Neo4j::OUTGOING
     end
 
     def each
@@ -104,19 +104,19 @@ module Neo4j::GraphAlgo
 
     def both(*types)
       types.each { |type| @types << org.neo4j.graphdb.DynamicRelationshipType.withName(type.to_s) }
-      @direction = org.neo4j.graphdb.Direction::BOTH
+      @direction = Neo4j::BOTH
       self
     end
 
     def outgoing(*types)
       types.each { |type| @types << org.neo4j.graphdb.DynamicRelationshipType.withName(type.to_s) }
-      @direction = org.neo4j.graphdb.Direction::OUTGOING
+      @direction = Neo4j::OUTGOING
       self
     end
 
     def incoming(*types)
       types.each { |type| @types << org.neo4j.graphdb.DynamicRelationshipType.withName(type.to_s) }
-      @direction = org.neo4j.graphdb.Direction::INCOMING
+      @direction = Neo4j::INCOMING
       self
     end
 

@@ -95,7 +95,7 @@ def calcSizeJava(node)
   child = org.neo4j.graphdb.DynamicRelationshipType.withName 'child'
   traverser = neoNode.traverse(org.neo4j.graphdb.Traverser::Order::DEPTH_FIRST, 
     org.neo4j.graphdb.StopEvaluator::END_OF_GRAPH, 
-    org.neo4j.graphdb.ReturnableEvaluator::ALL, child, org.neo4j.graphdb.Direction::OUTGOING )
+    org.neo4j.graphdb.ReturnableEvaluator::ALL, child, Neo4j::OUTGOING )
   while traverser.hasNext()
     node = traverser.next
     if node.hasProperty('size')

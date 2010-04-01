@@ -1,4 +1,4 @@
-include Java
+include Java if  defined? JRUBY_VERSION
 
 module Neo4j
   require 'neo4j/jars/neo4j-kernel-1.0.jar'

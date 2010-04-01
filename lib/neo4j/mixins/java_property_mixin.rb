@@ -27,9 +27,9 @@ module Neo4j::JavaPropertyMixin
   def [](key)
     return unless property?(key)
     if @_wrapper and @_wrapper.class.marshal?(key)
-      Marshal.load(String.from_java_bytes(get_property(key.to_s)))
+      Marshal.load(String.from_java_bytes(getProperty(key.to_s)))
     else
-      get_property(key.to_s)
+      getProperty(key.to_s)
     end
   end
 
@@ -158,7 +158,7 @@ module Neo4j::JavaPropertyMixin
 
   def wrapper_class  # :nodoc: 
     return nil unless wrapper?
-    classname = get_property(CLASSNAME_PROPERTY)
+    classname = getProperty(CLASSNAME_PROPERTY)
     classname.split("::").inject(Kernel) do |container, name|
       container.const_get(name.to_s)
     end

@@ -3,13 +3,13 @@ module Neo4j
 
     # Wrapper for org.neo4j.graphdb.ReturnableEvaluator
     #
-    # :api: private
     class ReturnableEvaluator #:nodoc:
-      include org.neo4j.graphdb.ReturnableEvaluator
+      include org.neo4j.graphdb.ReturnableEvaluator if defined? JRUBY_VERSION
 
       def initialize(proc, raw = false)
         @proc = proc
         @raw = raw
+        Rjb::bind(self, 'org.neo4j.graphdb.ReturnableEvaluator') unless defined? JRUBY_VERSION
       end
 
       def isReturnableNode( traversal_position )
@@ -29,23 +29,24 @@ module Neo4j
       end
     end
 
-    
+
     # Wrapper for the neo4j org.neo4j.graphdb.StopEvalutor interface.
     # Used in the Neo4j Traversers.
     #
     # :api: private
     class DepthStopEvaluator #:nodoc:
-      include org.neo4j.graphdb.StopEvaluator
+      include org.neo4j.graphdb.StopEvaluator if defined? JRUBY_VERSION
 
       def initialize(depth)
         @depth = depth
+        Rjb::bind(self, 'org.neo4j.graphdb.StopEvaluator') unless defined? JRUBY_VERSION
       end
 
       def isStopNode(pos)
         pos.depth >= @depth
       end
     end
-
   end
-  
+
+
 end

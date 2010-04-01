@@ -55,6 +55,11 @@ module Neo4j
     def_delegators Neo4j::ReferenceNode, :migration, :migrations
 
 
+    if defined? JRUBY_VERSION
+      OUTGOING = org.neo4j.graphdb.Direction::OUTGOING
+      INCOMING = org.neo4j.graphdb.Direction::INCOMING
+      BOTH = org.neo4j.graphdb.Direction::BOTH
+    end
 
     # Starts neo4j unless it is not already started.
     # Before using neo4j it has to be started and the location of the Neo database on the file system must
@@ -74,10 +79,11 @@ module Neo4j
     #
     def start(neo_instance=nil)
       return if running?
+      puts "Start from #{caller[0]}"
       at_exit do
         Neo4j.stop
       end
-      @neo = neo_instance || org.neo4j.kernel.EmbeddedGraphDatabase.new(Neo4j::Config[:storage_path])
+      @neo = neo_instance || start_db
       @ref_node = Neo4j::Transaction.run do
         ReferenceNode.new(@neo.getReferenceNode())
       end
@@ -89,6 +95,77 @@ module Neo4j
       Neo4j::Transaction.run { @ref_node.migrate!}
       nil
     end
+
+    def start_db # :nodoc:
+      puts "Start DB"
+      if defined? JRUBY_VERSION
+        start_jruby
+      else
+        start_rjb
+      end
+    end
+
+    def start_jruby # :nodoc:
+      org.neo4j.kernel.EmbeddedGraphDatabase.new(Neo4j::Config[:storage_path])      
+    end
+
+    def start_rjb # :nodoc:
+      puts "Starting RJB"
+      load_jvm(['-Xms128m', '-Xmx1024m'])
+      db = org.neo4j.kernel.EmbeddedGraphDatabase.new(Neo4j::Config[:storage_path])
+
+      # Extend the node class
+      tx = db.beginTx
+      db.getReferenceNode.class.class_eval do
+        # TODO - THIS IS NOT THE CORRECT WAY TO DO IT !!!
+        include Neo4j::JavaPropertyMixin
+        include Neo4j::JavaNodeMixin
+
+        def has_property?(p) hasProperty(p) end
+
+        # TODO Really really ugly, since we extend all java classes we have to avoid
+        def ==(other)
+          #puts "Compare #{_classname} == #{other._classname}"
+          return super if _classname == 'org.neo4j.kernel.impl.core.NodeProxy'
+          return object_id == other.object_id 
+        end
+
+        def getProperty(k)
+          value = super
+          case value._classname
+            when "java.lang.Integer" then value.intValue
+            when "java.lang.String" then value.toString
+            when "java.lang.Double" then value.doubleValue
+            when "java.lang.Boolean" then value.booleanValue
+            else raise "TODO unknown type '#{value._classname}'"
+          end
+        end
+
+        def getRelationships(*args)
+          # Match getRelationships()
+          return super if args.length == 0
+
+          # Match getRelationships(Direction dir)
+          raise "Unknown argument #{args.inspect}, not an RJB thingy" unless args[0].respond_to?(:_classname)
+          return _invoke('getRelationships', 'Lorg.neo4j.graphdb.Direction;', args[0]) if args[0]._classname == "org.neo4j.graphdb.Direction"
+
+          # Match getRelationships(RelationshipType type, Direction dir)
+          raise "Expects two arguments, got #{args.lentgh}" unless args.length == 2
+          raise "First arg should be org.neo4j.graphdb.DynamicRelationshipType, got '#{args[0]._classname}'" unless args[0]._classname == "org.neo4j.graphdb.DynamicRelationshipType"
+          raise "Second arg should be org.neo4j.graphdb.Direction, got '#{args[0]._classname}'" unless args[1]._classname == "org.neo4j.graphdb.Direction"
+          _invoke('getRelationships', 'Lorg.neo4j.graphdb.RelationshipType;Lorg.neo4j.graphdb.Direction;', args[0], args[1])
+        end
+      end unless db.getReferenceNode.respond_to?(:has_property?)
+
+      tx.success
+      tx.finish
+
+      Neo4j.const_set(:OUTGOING, org.neo4j.graphdb.Direction.OUTGOING)
+      Neo4j.const_set(:INCOMING, org.neo4j.graphdb.Direction.INCOMING)
+      Neo4j.const_set(:BOTH, org.neo4j.graphdb.Direction.BOTH)
+      db
+    end
+
 
     # Return the org.neo4j.kernel.EmbeddedGraphDatabase
     #

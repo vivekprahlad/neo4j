@@ -44,9 +44,14 @@ module Neo4j
       end
 
 
+
       def placebo?(tx)
         tx.java_object.java_type == 'org.neo4j.kernel.EmbeddedGraphDbImpl$PlaceboTransaction'
-      end
+      end if defined? JRUBY_VERSION
+
+      def placebo?(tx)
+        tx._classname == 'org.neo4j.kernel.EmbeddedGraphDbImpl$PlaceboTransaction' # TODO IS THIS CORRECT ?
+      end unless defined? JRUBY_VERSION
 
       # Creates a transaction. If one is already running then a 'placebo' transaction will be created instead.
       # A placebo transactions wraps the real transaction by not allowing the finish method to finish the

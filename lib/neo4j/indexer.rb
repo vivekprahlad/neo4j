@@ -60,13 +60,16 @@ module Neo4j
     end
 
     def index(node)
-      document = {:id => node.neo_id }
+      document = { }
 
       @document_updaters.each do |updater|
         updater.update_document(document, node)
       end
 
-      lucene_index << document
+      unless document.empty?
+        document.merge!({:id => node.neo_id})
+        lucene_index << document
+      end
     end
 
     def delete_index(node)
@@ -173,6 +176,7 @@ module Neo4j
     end
 
     def update_document(document, node)
+      puts "Hojo"
       relationships = node.rels.both(@rel_type).nodes
       relationships.each do |other_node|
         @properties.each do |p|
