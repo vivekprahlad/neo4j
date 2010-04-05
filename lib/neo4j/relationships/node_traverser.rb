@@ -17,8 +17,8 @@ module Neo4j
         @raw = raw
         @stop_evaluator = DepthStopEvaluator.new(1)
         @types_and_dirs = [] # what types of relationships and which directions should be traversed
-        @traverser_order = org.neo4j.graphdb.Traverser::Order::BREADTH_FIRST
-        @returnable_evaluator = org.neo4j.graphdb.ReturnableEvaluator::ALL_BUT_START_NODE
+        @returnable_evaluator = Neo4j::ALL_BUT_START_NODE
+        @traverser_order = Neo4j::BREADTH_FIRST
       end
 
       # if raw == true then it will return raw Java object instead of wrapped JRuby object which can improve performance.
@@ -42,7 +42,7 @@ module Neo4j
       # :api: public
       def depth(d)
         if d == :all
-          @stop_evaluator = org.neo4j.graphdb.StopEvaluator::END_OF_GRAPH
+          @stop_evaluator = Neo4j::END_OF_GRAPH
         else
           @stop_evaluator = DepthStopEvaluator.new(d)
         end
@@ -119,8 +119,13 @@ module Neo4j
           raise IllegalTraversalArguments.new "Unknown type of relationship. Needs to know which type(s) of relationship in order to traverse. Please use the outgoing, incoming or both method."
         end
 
+        array = java.util.ArrayList.new
+        puts "MAKE LIST"
+        list = array.toArray
+
+        3.times  { puts "HOHO !!!"}
         @_java_node.traverse(@traverser_order, @stop_evaluator,
-                                @returnable_evaluator, @types_and_dirs.to_java(:object))
+                                @returnable_evaluator, []) # list) # @types_and_dirs.to_java(:object))
       end
 
       def iterator

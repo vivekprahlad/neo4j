@@ -16,7 +16,7 @@ module Kernel
 
     found_path = $LOAD_PATH.find{|p| File.exist?(File.join(p,path))}
     raise unless found_path
-    
+
     abs_path = File.join(found_path, path)
     # check that the file exists
     raise unless  File.exist?(abs_path)

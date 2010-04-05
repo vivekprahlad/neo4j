@@ -56,3 +56,7 @@ require 'neo4j/version'
 require 'logger'
 $NEO_LOGGER = Logger.new(STDOUT)  # todo use a better logger
 $NEO_LOGGER.level = Logger::WARN
+
+
+# start the java bridge unless we are running JRuby
+Neo4j.start_rjb unless defined? JRUBY_VERSION

@@ -59,6 +59,10 @@ module Neo4j
       OUTGOING = org.neo4j.graphdb.Direction::OUTGOING
       INCOMING = org.neo4j.graphdb.Direction::INCOMING
       BOTH = org.neo4j.graphdb.Direction::BOTH
+
+      BREADTH_FIRST = org.neo4j.graphdb.Traverser::Order::BREADTH_FIRST
+      ALL_BUT_START_NODE = org.neo4j.graphdb.ReturnableEvaluator::ALL_BUT_START_NODE
+      END_OF_GRAPH = org.neo4j.graphdb.StopEvaluator::END_OF_GRAPH
     end
 
     # Starts neo4j unless it is not already started.
@@ -96,22 +100,29 @@ module Neo4j
       nil
     end
 
-    def start_db # :nodoc:
-      puts "Start DB"
-      if defined? JRUBY_VERSION
-        start_jruby
-      else
-        start_rjb
-      end
-    end
-
-    def start_jruby # :nodoc:
-      org.neo4j.kernel.EmbeddedGraphDatabase.new(Neo4j::Config[:storage_path])      
-    end
-
     def start_rjb # :nodoc:
+      # the last thing we should do after loading all the source code is starting the JVM
       puts "Starting RJB"
       load_jvm(['-Xms128m', '-Xmx1024m'])
+      Neo4j.const_set(:OUTGOING, org.neo4j.graphdb.Direction.OUTGOING)
+      Neo4j.const_set(:INCOMING, org.neo4j.graphdb.Direction.INCOMING)
+      Neo4j.const_set(:BOTH, org.neo4j.graphdb.Direction.BOTH)
+      Neo4j.const_set(:ALL_BUT_START_NODE, org.neo4j.graphdb.ReturnableEvaluator.ALL_BUT_START_NODE)
+      Neo4j.const_set(:END_OF_GRAPH, org.neo4j.graphdb.StopEvaluator.END_OF_GRAPH)
+
+      order = Rjb::import 'org.neo4j.graphdb.Traverser$Order'
+      Neo4j.const_set(:BREADTH_FIRST, order.BREADTH_FIRST)
+      puts "Loaded JVM !!!!!! Done\n"
+    end unless defined? JRUBY_VERSION
+
+    BREADTH_FIRST = "sune"
+    BREADTH_FIRST = "jakke"
+
+    def start_db # :nodoc:
+      org.neo4j.kernel.EmbeddedGraphDatabase.new(Neo4j::Config[:storage_path])      
+    end if defined? JRUBY_VERSION
+
+    def start_db # :nodoc:
       db = org.neo4j.kernel.EmbeddedGraphDatabase.new(Neo4j::Config[:storage_path])
 
       # Extend the node class
@@ -160,9 +171,6 @@ module Neo4j
       tx.success
       tx.finish
 
-      Neo4j.const_set(:OUTGOING, org.neo4j.graphdb.Direction.OUTGOING)
-      Neo4j.const_set(:INCOMING, org.neo4j.graphdb.Direction.INCOMING)
-      Neo4j.const_set(:BOTH, org.neo4j.graphdb.Direction.BOTH)
       db
     end
 

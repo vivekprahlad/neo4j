@@ -83,9 +83,9 @@ module Neo4j
       end
 
       def iterator
-        stop_evaluator = org.neo4j.graphdb.StopEvaluator::END_OF_GRAPH
-        traverser_order = org.neo4j.graphdb.Traverser::Order::BREADTH_FIRST
-        returnable_evaluator = org.neo4j.graphdb.ReturnableEvaluator::ALL_BUT_START_NODE
+        stop_evaluator = Neo4j::END_OF_GRAPH
+        traverser_order = Neo4j::BREADTH_FIRST
+        returnable_evaluator = Neo4j::ALL_BUT_START_NODE
         types_and_dirs = []
         types_and_dirs << org.neo4j.graphdb.DynamicRelationshipType.withName(@relationship_type.to_s)
         types_and_dirs << Neo4j::OUTGOING
