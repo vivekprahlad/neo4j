@@ -23,11 +23,8 @@ p2 = PersonX.new :name => 'p2'
 puts p1.name
 puts p2.name
 
-# the following line does not work since RJB need to load an enum in an Inner class -  org.neo4j.graphdb.Traverser::Order::BREADTH_FIRST
-# Should be possible to solve, check RJB mailing list for Enum
 p1.friends << p2
 
-# This does not yet work ...
 p1.friends.each {|x| puts x[:name]}
 
 Neo4j::Transaction.finish
