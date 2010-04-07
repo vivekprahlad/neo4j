@@ -55,15 +55,6 @@ module Neo4j
     def_delegators Neo4j::ReferenceNode, :migration, :migrations
 
 
-    if defined? JRUBY_VERSION
-      OUTGOING = org.neo4j.graphdb.Direction::OUTGOING
-      INCOMING = org.neo4j.graphdb.Direction::INCOMING
-      BOTH = org.neo4j.graphdb.Direction::BOTH
-
-      BREADTH_FIRST = org.neo4j.graphdb.Traverser::Order::BREADTH_FIRST
-      ALL_BUT_START_NODE = org.neo4j.graphdb.ReturnableEvaluator::ALL_BUT_START_NODE
-      END_OF_GRAPH = org.neo4j.graphdb.StopEvaluator::END_OF_GRAPH
-    end
 
     # Starts neo4j unless it is not already started.
     # Before using neo4j it has to be started and the location of the Neo database on the file system must

@@ -67,10 +67,8 @@ module Neo4j
       # ==== Returns
       # self - so that the << can be chained
       #
-      # :api: public
       def <<(other_node)
         source, target = @node, other_node
-        puts "Direction #@direction class #{@direction._classname}"
         source, target = target, source if @direction == Neo4j::INCOMING
         source.add_rel(@type, target)
         self

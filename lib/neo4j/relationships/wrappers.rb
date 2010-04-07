@@ -39,12 +39,17 @@ module Neo4j
 
       def initialize(depth)
         @depth = depth
-        Rjb::bind(self, 'org.neo4j.graphdb.StopEvaluator') unless defined? JRUBY_VERSION
+
       end
 
       def isStopNode(pos)
         pos.depth >= @depth
       end
+
+      def self.new(depth)
+        d = super
+        Rjb::bind(d, 'org.neo4j.graphdb.StopEvaluator')         
+      end unless defined? JRUBY_VERSION
     end
   end
 

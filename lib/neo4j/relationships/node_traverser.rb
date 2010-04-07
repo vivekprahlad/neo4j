@@ -118,14 +118,8 @@ module Neo4j
         if @types_and_dirs.empty?
           raise IllegalTraversalArguments.new "Unknown type of relationship. Needs to know which type(s) of relationship in order to traverse. Please use the outgoing, incoming or both method."
         end
-
-        array = java.util.ArrayList.new
-        puts "MAKE LIST"
-        list = array.toArray
-
-        3.times  { puts "HOHO !!!"}
-        @_java_node.traverse(@traverser_order, @stop_evaluator,
-                                @returnable_evaluator, []) # list) # @types_and_dirs.to_java(:object))
+          @_java_node.traverse(@traverser_order, @stop_evaluator,
+                                @returnable_evaluator, @types_and_dirs.to_java(:object))
       end
 
       def iterator

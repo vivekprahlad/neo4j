@@ -58,5 +58,31 @@ $NEO_LOGGER = Logger.new(STDOUT)  # todo use a better logger
 $NEO_LOGGER.level = Logger::WARN
 
 
-# start the java bridge unless we are running JRuby
-Neo4j.start_rjb unless defined? JRUBY_VERSION
+
+# -------------------------------------------------
+# Stuff to make C Ruby and JRuby a bit more similar
+# TODO maybe we should put this somewhere else
+
+module Neo4j
+if defined? JRUBY_VERSION
+    OUTGOING = org.neo4j.graphdb.Direction::OUTGOING
+    INCOMING = org.neo4j.graphdb.Direction::INCOMING
+    BOTH = org.neo4j.graphdb.Direction::BOTH
+
+    BREADTH_FIRST = org.neo4j.graphdb.Traverser::Order::BREADTH_FIRST
+    ALL_BUT_START_NODE = org.neo4j.graphdb.ReturnableEvaluator::ALL_BUT_START_NODE
+    END_OF_GRAPH = org.neo4j.graphdb.StopEvaluator::END_OF_GRAPH
+  end
+end
+
+unless defined? JRUBY_VERSION
+  class Array
+    def to_java(arg)
+      self
+    end
+  end
+
+  # start the java bridge unless we are running JRuby
+  Neo4j.start_rjb
+end
+
