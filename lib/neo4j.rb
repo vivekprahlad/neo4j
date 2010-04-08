@@ -4,7 +4,8 @@ require 'thread'
 require 'delegate'
 require 'forwardable'
 
-require 'neo4j/java_package' unless defined? JRUBY_VERSION
+require 'rjb_ext' unless defined? JRUBY_VERSION
+
 
 # external jars
 require 'neo4j/jars'

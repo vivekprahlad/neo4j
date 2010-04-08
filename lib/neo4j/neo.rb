@@ -93,7 +93,6 @@ module Neo4j
 
     def start_rjb # :nodoc:
       # the last thing we should do after loading all the source code is starting the JVM
-      puts "Starting RJB"
       load_jvm(['-Xms128m', '-Xmx1024m'])
       Neo4j.const_set(:OUTGOING, org.neo4j.graphdb.Direction.OUTGOING)
       Neo4j.const_set(:INCOMING, org.neo4j.graphdb.Direction.INCOMING)
@@ -103,11 +102,7 @@ module Neo4j
 
       order = Rjb::import 'org.neo4j.graphdb.Traverser$Order'
       Neo4j.const_set(:BREADTH_FIRST, order.BREADTH_FIRST)
-      puts "Loaded JVM !!!!!! Done\n"
     end unless defined? JRUBY_VERSION
-
-    BREADTH_FIRST = "sune"
-    BREADTH_FIRST = "jakke"
 
     def start_db # :nodoc:
       org.neo4j.kernel.EmbeddedGraphDatabase.new(Neo4j::Config[:storage_path])      
@@ -129,7 +124,7 @@ module Neo4j
         def ==(other)
           #puts "Compare #{_classname} == #{other._classname}"
           return super if _classname == 'org.neo4j.kernel.impl.core.NodeProxy'
-          return object_id == other.object_id 
+          return object_id == other.object_id
         end
 
         def getProperty(k)
