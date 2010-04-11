@@ -9,7 +9,7 @@ class Array
   def to_java(arg)
     self
   end
-end
+end 
 
 # Extend Neo4j
 module Lucene
@@ -27,6 +27,9 @@ module Lucene
   # org.apache.lucene.search.BooleanClause::Occur::MUST
   boolean_clause = Rjb::import 'org.apache.lucene.search.BooleanClause$Occur'
   Lucene.const_set(:OCCUR_MUST, boolean_clause.MUST)
+
+  # CRuby with in memory lucene db does not yet work, set default to store on file indexes
+  Config.setup.merge!({:store_on_file => true, :storage_path => 'tmp/lucene'})
 end
 
 module Neo4j
@@ -40,7 +43,7 @@ module Neo4j
   Neo4j.const_set(:BREADTH_FIRST, order.BREADTH_FIRST)
 
 
-# TODO - THIS IS NOT THE CORRECT WAY TO DO IT !!!
+  # TODO - THIS IS NOT THE CORRECT WAY TO DO IT !!!
   java.lang.String.new.class.class_eval do
     include Neo4j::JavaPropertyMixin
     include Neo4j::JavaNodeMixin

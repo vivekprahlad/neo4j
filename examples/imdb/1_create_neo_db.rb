@@ -9,6 +9,8 @@ Neo4j.migration 1, "Create DB by parsing IMDB file" do
       actors = 0
       no_films = 0
 
+      start = Time.new
+
       File.open(IMDB_FILE).each_line do |line|
         next if line.strip.empty?
 
@@ -53,6 +55,7 @@ Neo4j.migration 1, "Create DB by parsing IMDB file" do
         end
       end
       puts "created #{actors} actors and #{no_films} films"
+      puts "time #{Time.new - start} sec"      
     end
   end
 

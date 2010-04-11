@@ -2,7 +2,7 @@ module Lucene
   
   #
   # Contains info for a specific Index identified by a path
-  # Contains a 
+  # Contains a :
   # * collection of FieldInfo objects. 
   # * the name of the id field.
   # * the index storage, either file based or RAM based.
@@ -19,11 +19,11 @@ module Lucene
     # Initializes this object by setting values to default values specified in the Lucene::Config.
     # The path/id to the index is specified by the the path parameter.
     # If the index is Lucene::Config[:storage_path]
-    # ==== Block parameters
-    # path<String>:: The id or the (incomplete) path on the filesystem of the index
+    #
+    # ==== Parameters
+    # path:: The id or the (incomplete) path on the file system of the index (String, :to_s)
     #
     def initialize(path)
-      $LUCENE_LOGGER.debug{"IndexInfo#initialize(#{path})"}
       @id_field = Lucene::Config[:id_field].to_sym
       @path = path
       @store_on_file = Lucene::Config[:store_on_file]
@@ -66,18 +66,15 @@ module Lucene
     # If the index is stored on the filesystem the complete path will be
     # Lucene::Config[:storage_path] + /path
     # 
-    # ==== Block parameters
-    # path<String>:: The id or the (incomplete) path on the filesystem of the index
+    # ==== Parameters
+    # path:: The id or the (incomplete) path on the filesystem of the index (String, :to_s)
     #
-    # :api: public
     def self.instance(path)
       @instances ||= {}
-      $LUCENE_LOGGER.debug{"IndexInfos#instance(#{path}) : @instances[path]: #{@instances[path]}"}
       @instances[path] ||= IndexInfo.new(path)
     end
     
     def self.delete_all
-      $LUCENE_LOGGER.debug{"IndexInfos#delete_all"}
       @instances = nil
     end
     
@@ -112,7 +109,7 @@ module Lucene
             when :stop
               wrapper.addAnalyzer(key.to_s, org.apache.lucene.analysis.StopAnalyzer.new)
             else
-              raise "Unknown analyzer, supports :keyword, :standard, :simple, :stop, :whitspace, got '#{value}' for field '#{key}'"
+              raise "Unknown analyzer, supports :keyword, :standard, :simple, :stop, :whitespace, got '#{value}' for field '#{key}'"
           end
         end
         wrapper
@@ -129,7 +126,6 @@ module Lucene
 
     def [](key)
       k = key.to_sym
-      $LUCENE_LOGGER.debug{"FieldInfos create new FieldInfo key '#{k}'"} if @infos[k].nil?
       @infos[k] ||= DEFAULTS.dup
       @infos[k]
     end

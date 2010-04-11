@@ -1,4 +1,15 @@
 require 'neo4j'
+#Lucene::Config.setup.merge!({:store_on_file => true, :storage_path => '/tmp/foo'})
+
+#@index = Lucene::Index.new('myindex')
+#@index.field_infos[:name] = Lucene::FieldInfo.new(:store => true)
+#@index.commit
+#result = @index.find(:id=>"1")
+#
+#puts "Result #{result.size}"
+
+#exit
+
 Neo4j.start
 Neo4j::Transaction.new
 a = Neo4j::Node.new
@@ -30,11 +41,6 @@ p1.friends.each {|x| puts x[:name]}
 Neo4j::Transaction.finish
 
 Neo4j::Transaction.run do
-
-  # THIS DOES NOT YET WORK
-  # Have to fix how the IndexSearcher uses path paremter, see Lucene::Index#find
-  # searcher = IndexSearcher.new(@index_info.storage) and storage parameter is a RJB class that does not give the path
-  #
 
   people = PersonX.find(:name => 'p1')
   p1 = people[0]

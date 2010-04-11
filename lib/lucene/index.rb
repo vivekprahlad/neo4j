@@ -191,7 +191,7 @@ module Lucene
     def find(*query, &block)
       # new method is a factory method, does not create if it already exists
       # TODO can't use storage as path
-      searcher = IndexSearcher.new(@index_info.storage)
+      searcher = IndexSearcher.new(@index_info)
 
       if block.nil?
         case query.first

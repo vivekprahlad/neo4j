@@ -29,7 +29,7 @@ module Neo4j
     # to:: create relationship to this node
     #
     def initialize(*args)
-      if (args[0].kind_of?(Java::org.neo4j.graphdb.Relationship))
+      if (rel_given?(args[0])) #.kind_of?(org.neo4j.graphdb.Relationship))
         init_with_rel(args[0])
       else
         init_with_args(*args)
@@ -39,6 +39,14 @@ module Neo4j
       super()
     end
 
+
+    def rel_given?(rel)
+      rel.kind_of?(org.neo4j.graphdb.Relationship)
+    end if defined? JRUBY_VERSION
+
+    def rel_given?(rel)
+      rel.respond_to?(:_classname) && rel._classname == "org.neo4j.kernel.impl.core.RelationshipProxy"  # TODO ugly, must be a better way to make it similar to JRuby kind_of?
+    end unless defined? JRUBY_VERSION
 
     # Initialize this relationship with the given arguments
 

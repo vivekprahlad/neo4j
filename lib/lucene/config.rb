@@ -35,9 +35,9 @@ module Lucene
       # c<Hash>:: The configuration parameters.
       #
       # ==== Examples
-      # Lucene::Config.use do |config|
-      # config[:in_memory] = true
-      # end
+      #   Lucene::Config.use do |config|
+      #     config[:in_memory] = true
+      #   end
       #
       # ==== Returns
       # nil
@@ -52,8 +52,8 @@ module Lucene
       # Set the value of a config entry.
       #
       # ==== Parameters
-      # key<Object>:: The key to set the parameter for.
-      # val<Object>:: The value of the parameter.
+      # key:: The key to set the parameter for.
+      # val:: The value of the parameter.
       #
       def []=(key, val)
         (@configuration ||= setup)[key] = val
@@ -63,7 +63,7 @@ module Lucene
       # Gets the the value of a config entry
       #
       # ==== Parameters
-      # key<Object>:: The key of the config entry value we want
+      # key:: The key of the config entry value we want
       #
       def [](key)
         (@configuration ||= setup)[key]
@@ -73,7 +73,7 @@ module Lucene
       # Remove the value of a config entry.
       #
       # ==== Parameters
-      # key<Object>:: The key of the parameter to delete.
+      # key:: The key of the parameter to delete.
       #
       # ==== Returns
       # Object:: The value of the removed entry.

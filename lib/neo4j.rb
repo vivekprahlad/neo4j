@@ -59,6 +59,14 @@ if defined? JRUBY_VERSION
     ALL_BUT_START_NODE = org.neo4j.graphdb.ReturnableEvaluator::ALL_BUT_START_NODE
     END_OF_GRAPH = org.neo4j.graphdb.StopEvaluator::END_OF_GRAPH
   end
+
+  module Lucene
+    Lucene.const_set(:STORE_YES, org.apache.lucene.document.Field::Store::YES)
+    Lucene.const_set(:STORE_NO, org.apache.lucene.document.Field::Store::NO)
+    Lucene.const_set(:INDEX_ANALYZED, org.apache.lucene.document.Field::Index::ANALYZED)
+    Lucene.const_set(:INDEX_NOT_ANALYZED, org.apache.lucene.document.Field::Index::NOT_ANALYZED)
+    Lucene.const_set(:OCCUR_MUST, org.apache.lucene.search.BooleanClause::Occur::MUST)
+  end
 else
   require 'neo4j_rjb_ext'
 end

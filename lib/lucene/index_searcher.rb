@@ -46,18 +46,19 @@ module Lucene
   #
   class IndexSearcher
     
-    @@paths = {}
+    @@directories = {}
     
-    def initialize(path)
-      @path = path
+    def initialize(directory)
+      @directory = directory
     end
 
     #
     # Only create a new object if it does not already exist for this path    
     #
-    def self.new(path)
-      @@paths[path] = super(path) if @@paths[path].nil?
-      @@paths[path]
+    def self.new(index_info)
+      path = index_info.path
+      @@directories[path] = super(index_info.storage) if @@directories[path].nil?
+      @@directories[path]
     end
 
     def find_dsl(field_infos,&block)
@@ -138,11 +139,10 @@ module Lucene
     # Checks if it needs to reload the index searcher
     #
     def index_searcher
-      # IT DOES NOT WORK HERE YET 
-      if @index_reader.nil? || @index_reader.getVersion() != org.apache.lucene.index.IndexReader.getCurrentVersion(@path)
-        @index_reader = org.apache.lucene.index.IndexReader.open(@path)
-        @index_searcher = org.apache.lucene.search.IndexSearcher.new(@index_reader)
-        $LUCENE_LOGGER.debug("Opened new IndexSearcher for #{to_s}")
+      if @index_reader.nil? || @index_reader.getVersion() != org.apache.lucene.index.IndexReader.getCurrentVersion(@directory)
+        @index_reader = org.apache.lucene.index.IndexReader.open(@directory, true)
+        @index_searcher = org.apache.lucene.search.IndexSearcher.new(@index_reader) if defined? JRUBY_VERSION
+        @index_searcher = org.apache.lucene.search.IndexSearcher.new_with_sig('Lorg.apache.lucene.index.IndexReader;', @index_reader) unless defined? JRUBY_VERSION
       end
       @index_searcher
     end
@@ -151,7 +151,7 @@ module Lucene
     # Returns true if the index already exists.
     #
     def exist?
-      org.apache.lucene.index.IndexReader.index_exists(@path)
+      org.apache.lucene.index.IndexReader.index_exists(@directory)
     end
 
   end
