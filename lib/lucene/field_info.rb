@@ -34,11 +34,11 @@ module Lucene
       # decide if the field should be stored in the lucene index or not
 
       # TODO make it RJB Compatible
-      store = store? ? org.apache.lucene.document.Field::Store::YES : org.apache.lucene.document.Field::Store::NO
+      store = store? ? Lucene::STORE_YES : Lucene::STORE_NO
 
       # decide if it should be tokenized/analyzed by lucene
       # TODO make it RJB Compatible
-      token_type = tokenized? ? org.apache.lucene.document.Field::Index::ANALYZED : org.apache.lucene.document.Field::Index::NOT_ANALYZED
+      token_type = tokenized? ? Lucene::INDEX_ANALYZED : Lucene::INDEX_NOT_ANALYZED
       $LUCENE_LOGGER.debug{"java_field store=#{store} key='#{key.to_s}' value='#{cvalue}' token_type=#{token_type}"}
 
       # create the new Field

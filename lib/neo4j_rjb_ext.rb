@@ -11,8 +11,24 @@ class Array
   end
 end
 
-# -------------------------------------------------
 # Extend Neo4j
+module Lucene
+  # TODO FIX JRUBY
+  # org.apache.lucene.document.Field::Store::YES : org.apache.lucene.document.Field::Store::NO
+  store = Rjb::import 'org.apache.lucene.document.Field$Store'
+  Lucene.const_set(:STORE_YES, store.YES)
+  Lucene.const_set(:STORE_NO, store.NO)
+
+  # org.apache.lucene.document.Field::Index::ANALYZED : org.apache.lucene.document.Field::Index::NOT_ANALYZED
+  index = Rjb::import 'org.apache.lucene.document.Field$Index'
+  Lucene.const_set(:INDEX_ANALYZED, index.ANALYZED)
+  Lucene.const_set(:INDEX_NOT_ANALYZED, index.NOT_ANALYZED)
+
+  # org.apache.lucene.search.BooleanClause::Occur::MUST
+  boolean_clause = Rjb::import 'org.apache.lucene.search.BooleanClause$Occur'
+  Lucene.const_set(:OCCUR_MUST, boolean_clause.MUST)
+end
+
 module Neo4j
   Neo4j.const_set(:OUTGOING, org.neo4j.graphdb.Direction.OUTGOING)
   Neo4j.const_set(:INCOMING, org.neo4j.graphdb.Direction.INCOMING)

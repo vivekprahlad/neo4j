@@ -88,7 +88,7 @@ module Lucene
         query.each_pair do |key,value|
           field = field_info[key]
           q = field.convert_to_query(key, value)
-          bquery.add(q, org.apache.lucene.search.BooleanClause::Occur::MUST)
+          bquery.add(q, Lucene::OCCUR_MUST)
         end
         bquery
       else
@@ -138,6 +138,7 @@ module Lucene
     # Checks if it needs to reload the index searcher
     #
     def index_searcher
+      # IT DOES NOT WORK HERE YET 
       if @index_reader.nil? || @index_reader.getVersion() != org.apache.lucene.index.IndexReader.getCurrentVersion(@path)
         @index_reader = org.apache.lucene.index.IndexReader.open(@path)
         @index_searcher = org.apache.lucene.search.IndexSearcher.new(@index_reader)

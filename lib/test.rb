@@ -13,8 +13,8 @@ class PersonX
   include Neo4j::NodeMixin
   has_n :friends
   property :name
-  # lucene index does not yet work does not work because lucene does not work with RJB
-  # Need to access in RJB -  org.apache.lucene.document.Field::Store::YES : org.apache.lucene.document.Field::Store::NO 
+  index :name
+  
 end
 
 p1 = PersonX.new :name => 'p1'
@@ -28,3 +28,15 @@ p1.friends << p2
 p1.friends.each {|x| puts x[:name]}
 
 Neo4j::Transaction.finish
+
+Neo4j::Transaction.run do
+
+  # THIS DOES NOT YET WORK
+  # Have to fix how the IndexSearcher uses path paremter, see Lucene::Index#find
+  # searcher = IndexSearcher.new(@index_info.storage) and storage parameter is a RJB class that does not give the path
+  #
+
+  people = PersonX.find(:name => 'p1')
+  p1 = people[0]
+  puts "Found #{p1[:name]}"
+end

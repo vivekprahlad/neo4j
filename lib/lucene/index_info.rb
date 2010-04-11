@@ -22,7 +22,6 @@ module Lucene
     # ==== Block parameters
     # path<String>:: The id or the (incomplete) path on the filesystem of the index
     #
-    # :api: private
     def initialize(path)
       $LUCENE_LOGGER.debug{"IndexInfo#initialize(#{path})"}
       @id_field = Lucene::Config[:id_field].to_sym
