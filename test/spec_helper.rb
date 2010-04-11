@@ -5,9 +5,6 @@
 require 'fileutils'
 require 'tmpdir'
 
-# suppress all warnings
-$NEO_LOGGER.level = Logger::ERROR
-
 NEO_STORAGE = Dir::tmpdir + "/neo_storage"
 LUCENE_INDEX_LOCATION = Dir::tmpdir + "/lucene"
 

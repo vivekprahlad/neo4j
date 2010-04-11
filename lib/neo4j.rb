@@ -4,8 +4,8 @@ require 'thread'
 require 'delegate'
 require 'forwardable'
 
+# rjb_ext is needed to setup the classpath for the RJB CRuby JARs
 require 'rjb_ext' unless defined? JRUBY_VERSION
-
 
 # external jars
 require 'neo4j/jars'
@@ -49,23 +49,8 @@ require 'neo4j/relationship'
 require 'neo4j/version'
 
 
-
-# 
-# Set logger used by Neo4j
-# Need to be done first since loading the required files might use this logger
-#
-require 'logger'
-$NEO_LOGGER = Logger.new(STDOUT)  # todo use a better logger
-$NEO_LOGGER.level = Logger::WARN
-
-
-
-# -------------------------------------------------
-# Stuff to make C Ruby and JRuby a bit more similar
-# TODO maybe we should put this somewhere else
-
-module Neo4j
 if defined? JRUBY_VERSION
+  module Neo4j
     OUTGOING = org.neo4j.graphdb.Direction::OUTGOING
     INCOMING = org.neo4j.graphdb.Direction::INCOMING
     BOTH = org.neo4j.graphdb.Direction::BOTH
@@ -74,16 +59,8 @@ if defined? JRUBY_VERSION
     ALL_BUT_START_NODE = org.neo4j.graphdb.ReturnableEvaluator::ALL_BUT_START_NODE
     END_OF_GRAPH = org.neo4j.graphdb.StopEvaluator::END_OF_GRAPH
   end
+else
+  require 'neo4j_rjb_ext'
 end
 
-unless defined? JRUBY_VERSION
-  class Array
-    def to_java(arg)
-      self
-    end
-  end
-
-  # start the java bridge unless we are running JRuby
-  Neo4j.start_rjb
-end
 

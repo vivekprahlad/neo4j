@@ -5,9 +5,6 @@
 require 'fileutils'
 require 'tmpdir'
  
-# suppress all warnings
-$NEO_LOGGER.level = Logger::ERROR
- 
 def delete_db
   # delete db on filesystem
   FileUtils.rm_rf Neo4j::Config[:storage_path]  # NEO_STORAGE

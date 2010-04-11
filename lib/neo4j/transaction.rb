@@ -225,7 +225,6 @@ module Neo4j
       raise NotInTransactionError.new unless Transaction.running?
       @neo_tx.failure
       @failure = true
-      $NEO_LOGGER.info{"failure #{self.to_s}"}
     end
 
   end
