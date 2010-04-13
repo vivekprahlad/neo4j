@@ -13,6 +13,8 @@ require 'neo4j/jars'
 # lucene
 require 'lucene'
 
+
+
 # config
 require 'neo4j/config'
 
@@ -50,25 +52,9 @@ require 'neo4j/version'
 
 
 if defined? JRUBY_VERSION
-  module Neo4j
-    OUTGOING = org.neo4j.graphdb.Direction::OUTGOING
-    INCOMING = org.neo4j.graphdb.Direction::INCOMING
-    BOTH = org.neo4j.graphdb.Direction::BOTH
-
-    BREADTH_FIRST = org.neo4j.graphdb.Traverser::Order::BREADTH_FIRST
-    ALL_BUT_START_NODE = org.neo4j.graphdb.ReturnableEvaluator::ALL_BUT_START_NODE
-    END_OF_GRAPH = org.neo4j.graphdb.StopEvaluator::END_OF_GRAPH
-  end
-
-  module Lucene
-    Lucene.const_set(:STORE_YES, org.apache.lucene.document.Field::Store::YES)
-    Lucene.const_set(:STORE_NO, org.apache.lucene.document.Field::Store::NO)
-    Lucene.const_set(:INDEX_ANALYZED, org.apache.lucene.document.Field::Index::ANALYZED)
-    Lucene.const_set(:INDEX_NOT_ANALYZED, org.apache.lucene.document.Field::Index::NOT_ANALYZED)
-    Lucene.const_set(:OCCUR_MUST, org.apache.lucene.search.BooleanClause::Occur::MUST)
-  end
+  require 'neo4j/jruby'
 else
-  require 'neo4j_rjb_ext'
+  require 'neo4j/rjb'
 end
 
 

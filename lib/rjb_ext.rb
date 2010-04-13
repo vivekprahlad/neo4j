@@ -14,7 +14,9 @@ module Kernel
      # check that it's not a jar file
     raise unless path =~ /\.jar/
 
-    found_path = $LOAD_PATH.find{|p| File.exist?(File.join(p,path))}
+    # This will maybe use the wrong jar file from a previous version of the GEM
+    #puts "LOAD PATH #{$LOAD_PATH}"
+    found_path = $LOAD_PATH.reverse.find{|p| File.exist?(File.join(p,path))}
     raise unless found_path
 
     abs_path = File.join(found_path, path)
@@ -28,13 +30,18 @@ module Kernel
     # TODO
   end
 
+  @@jvm_loaded = false
+
   def load_jvm(jargs)
+    # avoid starting the JVM twice
+    return if @@jvm_loaded
+    
+    @@jvm_loaded = true
     classpath = ENV['CLASSPATH'] ||= ''
     @@rjb_jars.each do |jar|
       classpath += File::PATH_SEPARATOR unless classpath.empty?
       classpath += jar
     end
-    puts "LOAD JVM WITH '#{classpath}'"
     Rjb::load(classpath, jargs)
   end
 end
@@ -85,41 +92,4 @@ end
 
 def java
   JavaPackage.new('java')
-end
-
-# Copied from http://github.com/arton/rjb/blob/master/lib/rjb.rb
-# waiting for a new release of RJB, until then we have to do it our self
-
-module Rjb
-#  alias org_import import
-  @@org_import = instance_method(:import)
-  def import(s)
-    o = @@org_import.bind(self).call(s)
-    o.instance_eval do
-      @user_initialize = nil
-      @org_new ||= method(:new)
-      @org_new_with_sig ||= method(:new_with_sig)
-#      define_method(:create_node) |args|
-      def new_with_sig(*args)
-        prepare_proxy(@org_new_with_sig.call(*args))
-      end
-      def new(*args)
-        prepare_proxy(@org_new.call(*args))
-      end
-      def class_eval(&proc)
-        @user_initialize = proc
-      end
-      private
-      def prepare_proxy(pxy)
-        pxy.instance_eval do
-          def include(*mod)
-            extend *mod
-          end
-        end
-        pxy.instance_eval &@user_initialize if @user_initialize
-        pxy
-      end
-    end
-    o
-  end
 end
