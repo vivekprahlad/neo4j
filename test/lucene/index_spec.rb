@@ -13,6 +13,10 @@ describe Index, '(one uncommited document)' do
     @index << {:id => '42', :name => 'andreas'}
   end
 
+  after(:each) do
+    rm_lucene_db
+  end
+
   it "has a to_s method with which says: index path and number of not commited documents" do
     @index.to_s.should == "Index [path: 'my_index', 1 documents]"
   end
@@ -49,6 +53,10 @@ describe Index, '(no uncommited documents)' do
     @index.clear
   end
 
+  after(:each) do
+    rm_lucene_db
+  end
+
   it "has a to_s method with which says: index path and no uncommited documents" do
     @index.to_s.should == "Index [path: 'myindex', 0 documents]"
   end
@@ -65,6 +73,10 @@ describe Index, ".find (range)" do
     @index = Index.new('some_index')
     @index.field_infos[:id][:type] = Fixnum
     @index.field_infos[:value][:type] = Fixnum
+  end
+
+  after(:each) do
+    rm_lucene_db
   end
 
   it "should find docs using an inclusive range query" do
@@ -122,6 +134,10 @@ describe Index, ".find (with TOKENIZED index)" do
     @index.commit
   end
 
+  after(:each) do
+    rm_lucene_db
+  end
+
   it "should find indexed documents using the tokenized field" do
     result = @index.find(:name=>"hello")
     result.size.should == 3
@@ -165,6 +181,10 @@ describe Index, "#find (with string queries)" do
     @index.commit
   end
 
+  after(:each) do
+    rm_lucene_db
+  end
+
 
   it "should find a doc by only using its id, index.find('1')" do
     r = @index.find("1")
@@ -194,6 +214,10 @@ end
 
 
 describe Index, ".find (exact match)" do
+  after(:each) do
+    rm_lucene_db
+  end
+
   before(:each) do
     setup_lucene
     @index = Index.new('myindex')
@@ -276,6 +300,10 @@ describe Index, "<< (add documents to be commited)" do
     @index.field_infos[:foo] = FieldInfo.new(:store => true)
   end
 
+  after(:each) do
+    rm_lucene_db
+  end
+
   it "converts all fields into strings" do
     @index << {:id => 42, :foo => 1}
     @index.uncommited['42'][:foo].should == '1'
@@ -299,6 +327,10 @@ end
 describe Index, ".id_field" do
   before(:each) do
     setup_lucene
+  end
+
+  after(:each) do
+    rm_lucene_db
   end
 
   it "has a default" do
@@ -351,16 +383,20 @@ describe Index, ".id_field" do
 end
 
 describe Index, ".new" do
+  after(:each) do
+    rm_lucene_db
+  end
+
   it "should not create a new instance if one already exists (singelton)" do
-    index1 = Index.new($INDEX_DIR)
-    index2 = Index.new($INDEX_DIR)
+    index1 = Index.new('a')
+    index2 = Index.new('a')
     index1.object_id.should == index2.object_id
   end
 
   it "should be possible to create a new instance even if one already exists" do
-    index1 = Index.new($INDEX_DIR)
+    index1 = Index.new('a')
     index1.clear
-    index2 = Index.new($INDEX_DIR)
+    index2 = Index.new('a')
     index1.object_id.should_not == index2.object_id
   end
 end
@@ -370,6 +406,10 @@ describe Index, ".field_infos" do
     setup_lucene
     @index = Index.new('myindex')
     @index.clear
+  end
+
+  after(:each) do
+    rm_lucene_db
   end
 
   it "has a default value for the id_field - store => true" do
@@ -467,6 +507,10 @@ describe Index, " when updating a document" do
   before(:each) do
     setup_lucene
     @index = Index.new('myindex')
+  end
+
+  after(:each) do
+    rm_lucene_db
   end
 
   it "should remove the field if set to nil" do
@@ -593,6 +637,10 @@ describe Index, " #analyzer" do
     @index = Index.new('myindex')
   end
 
+  after(:each) do
+    rm_lucene_db
+  end
+  
   it "should default to StandardAnalyzer" do
 #    @index.analyzer = :keyword
 

@@ -8,3 +8,9 @@ def setup_lucene
   Lucene::Config.delete_all
   Lucene::Config[:store_on_file] = false
 end
+
+def rm_lucene_db
+  Lucene::Transaction.commit
+  FileUtils.rm_rf Lucene::Config[:storage_path] unless Lucene::Config[:storage_path].nil?
+end
+

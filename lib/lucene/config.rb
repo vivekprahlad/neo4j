@@ -22,9 +22,9 @@ module Lucene
       #
       def defaults
         @defaults ||= {
-          :store_on_file => false,
+          :store_on_file => true,
           :id_field => :id,
-          :storage_path => nil
+          :storage_path => 'tmp'
         }
       end
 

@@ -8,14 +8,13 @@ module Lucene
     def initialize
       raise TransactionAlreadyRunningException.new if Transaction.running?
       Thread.current[:lucene_transaction] = self
-      
+
       @rollback = false
-      @commited = false
       @indexes = {} # key is the path to index, value is the index instance
     end
 
     def to_s
-      "Transaction [commited=#@commited, rollback=#@rollback, indexes=#{@indexes.size}, object_id=#{object_id}]"
+      "Transaction [rollback=#@rollback, indexes=#{@indexes.size}, object_id=#{object_id}]"
     end
 
     
@@ -24,15 +23,15 @@ module Lucene
     #
     def commit
       if !@rollback
-        @indexes.each_value do |index| 
+        @indexes.each_value do |index|
           index.commit
-        end 
+        end
       end
-      @commited = true
+      # Clear this transaction
       @indexes.clear
       Thread.current[:lucene_transaction] = nil
     end
-    
+
     def failure
       @rollback = true
       $LUCENE_LOGGER.debug{"Rollback Lucene Transaction"}      
@@ -79,7 +78,8 @@ module Lucene
     def index(path)
       @indexes[path]
     end
-    
+
+
     #
     # Class methods
     #
@@ -106,6 +106,9 @@ module Lucene
         Thread.current[:lucene_transaction]
       end
       
+      def commit
+        current.commit if running?
+      end
       
       def running?
         self.current != nil 

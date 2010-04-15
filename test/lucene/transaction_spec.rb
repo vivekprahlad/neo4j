@@ -9,15 +9,18 @@ describe Lucene::Transaction do
   before(:each) do
     setup_lucene
   end
+
+  after(:each) do
+    rm_lucene_db
+  end
   
   it "should have a to_s method" do
     t = Lucene::Transaction.new 
-    t.to_s.should match(/Transaction \[commited=false, rollback=false, indexes=0, object_id=/)
+    t.to_s.should match(/Transaction \[rollback=false, indexes=0, object_id=/)
   end
   
   it "should reuse Index instance in the same transaction" do
     # given
-    index = nil
     Lucene::Transaction.run do
       index1 = Index.new('var/index/foo')        
       index2 = Index.new('var/index/foo')        
