@@ -38,6 +38,8 @@ p1.friends << p2
 
 p1.friends.each {|x| puts x[:name]}
 
+p1.del
+
 Neo4j::Transaction.finish
 
 Neo4j::Transaction.run do

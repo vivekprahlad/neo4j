@@ -152,7 +152,6 @@ module Neo4j::JavaNodeMixin
   # Deletes all relationships as well.
   # Invoking any methods on this node after delete() has returned is invalid and may lead to unspecified behavior.
   #
-  # :api: public
   def del
     Neo4j.event_handler.node_deleted(wrapper)
 

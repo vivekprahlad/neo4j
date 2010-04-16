@@ -24,18 +24,28 @@ module Neo4j
   # TODO - THIS IS NOT THE CORRECT WAY TO DO IT !!!
   java.lang.String.new.class.class_eval do
     include Neo4j::JavaPropertyMixin
+    include Neo4j::JavaRelationshipMixin
+    alias_method :rel_del, :del
     include Neo4j::JavaNodeMixin
+    alias_method :node_del, :del
 
     def has_property?(p)
       hasProperty(p)
     end
 
+    def del
+      # we have to handle method that clash - REALLY UGLY
+      if _classname == 'org.neo4j.kernel.impl.core.NodeProxy'
+        node_del
+      else
+        rel_del
+      end
+    end 
     # TODO Really really ugly, since we extend all java classes we have to avoid
     def ==(other)
       #puts "Compare #{_classname} == #{other._classname}"
-      return super if _classname == 'org.neo4j.kernel.impl.core.NodeProxy'
-      super
-      #return object_id == other.object_id
+      return super if _classname == 'org.neo4j.kernel.impl.core.NodeProxy' || _classname == 'org.neo4j.kernel.impl.core.RelationshipProxy'
+      return object_id == other.object_id
     end
 
     def getProperty(k)
@@ -58,6 +68,7 @@ module Neo4j
       # Match getRelationships()
       return super if args.length == 0
 
+      raise "Called getRelationships on a none Neo4j Node" if self._classname != 'org.neo4j.kernel.impl.core.NodeProxy'
       # Match getRelationships(Direction dir)
       raise "Unknown argument #{args.inspect}, not an RJB thingy" unless args[0].respond_to?(:_classname)
       return _invoke('getRelationships', 'Lorg.neo4j.graphdb.Direction;', args[0]) if args[0]._classname == "org.neo4j.graphdb.Direction"

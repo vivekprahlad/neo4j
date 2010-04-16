@@ -20,7 +20,7 @@ module Neo4j
       id = getOtherNode(neo_node).getId
       Neo4j.load_node(id)
     end
-  end if defined? JRUBY_VERSION  # TODO for C Ruby / RJB
+  end if defined? JRUBY_VERSION
 
   #
   # A relationship between two nodes in the graph. A relationship has a start node, an end node and a type.
