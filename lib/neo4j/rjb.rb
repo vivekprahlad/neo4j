@@ -1,6 +1,6 @@
 # -------------------------------------------------
 # Stuff to make C Ruby and JRuby a bit more similar
-# TODO maybe we should put this somewhere else
+# TODO maybe we should put this somewhere else - duplicated code
 
 class Array
   def to_java(arg)
@@ -34,7 +34,8 @@ module Neo4j
     def ==(other)
       #puts "Compare #{_classname} == #{other._classname}"
       return super if _classname == 'org.neo4j.kernel.impl.core.NodeProxy'
-      return object_id == other.object_id
+      super
+      #return object_id == other.object_id
     end
 
     def getProperty(k)

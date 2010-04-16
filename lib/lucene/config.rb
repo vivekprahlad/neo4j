@@ -24,7 +24,7 @@ module Lucene
         @defaults ||= {
           :store_on_file => true,
           :id_field => :id,
-          :storage_path => 'tmp'
+          :storage_path => 'db/lucene/'
         }
       end
 

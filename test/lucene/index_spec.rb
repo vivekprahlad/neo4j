@@ -79,23 +79,6 @@ describe Index, ".find (range)" do
     rm_lucene_db
   end
 
-  it "should find docs using an inclusive range query" do
-    # given
-    @docs = {}
-    for i in 1..5 do
-      @index << {:id => i, :value=>i}
-      @docs[i] = @index.uncommited[i]
-    end
-    @index.commit
-
-    # when
-    result = @index.find(:value => 2..4)
-
-    # then
-    result.size.should == 3
-    result.should include(@docs[2], @docs[3], @docs[4])
-  end
-
   it "should find docs using an inclusive range query with padding 0's" do
     # given
     @index << {:id => 3, :value=>3}
@@ -113,6 +96,24 @@ describe Index, ".find (range)" do
     result.size.should == 2
     result.should include(doc30, doc32)
   end
+
+  it "should find docs using an inclusive range query" do
+    # given
+    @docs = {}
+    for i in 1..5 do
+      @index << {:id => i, :value=>i}
+      @docs[i] = @index.uncommited[i]
+    end
+    @index.commit
+
+    # when
+    result = @index.find(:value => 2..4)
+
+    # then
+    result.size.should == 3
+    result.should include(@docs[2], @docs[3], @docs[4])
+  end
+
 
 end
 

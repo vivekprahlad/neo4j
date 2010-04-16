@@ -105,7 +105,7 @@ describe Lucene::QueryDSL do
   it "should generate a lucene query" do
     expr = Lucene::QueryDSL.parse{ name == 'andreas' }
     query = expr.to_lucene(Lucene::IndexInfo.new(:id))
-    query.should be_kind_of(Java::OrgApacheLuceneSearch::TermQuery)
+    query.should be_kind_of(Java::OrgApacheLuceneSearch::TermQuery) if defined? JRUBY_VERSION
     term = query.getTerm
     term.field.should == 'name'
     term.text.should == 'andreas'
@@ -124,8 +124,7 @@ describe Lucene::QueryDSL do
     expr = Lucene::QueryDSL.parse{ (name == 'andreas') & (age == 1) }
     query = expr.to_lucene(Lucene::IndexInfo.new(:id))
     
-    query.should be_kind_of(Java::OrgApacheLuceneSearch::BooleanQuery)
-        
+    query.should be_kind_of(Java::OrgApacheLuceneSearch::BooleanQuery) if defined? JRUBY_VERSION
     clauses = query.getClauses() 
     clauses.size.should == 2
     

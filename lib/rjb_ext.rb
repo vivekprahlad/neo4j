@@ -24,7 +24,6 @@ module Kernel
     raise unless  File.exist?(abs_path)
 
     # try to load it using RJB
-    puts "REQUIRE JAR FILE at  '#{abs_path}'"
     @@rjb_jars ||= []
     @@rjb_jars << abs_path unless @@rjb_jars.include?(abs_path)
     # TODO

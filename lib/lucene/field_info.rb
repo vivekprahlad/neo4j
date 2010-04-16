@@ -32,14 +32,10 @@ module Lucene
       return nil if cvalue.nil?
 
       # decide if the field should be stored in the lucene index or not
-
-      # TODO make it RJB Compatible
       store = store? ? Lucene::STORE_YES : Lucene::STORE_NO
 
       # decide if it should be tokenized/analyzed by lucene
-      # TODO make it RJB Compatible
       token_type = tokenized? ? Lucene::INDEX_ANALYZED : Lucene::INDEX_NOT_ANALYZED
-      $LUCENE_LOGGER.debug{"java_field store=#{store} key='#{key.to_s}' value='#{cvalue}' token_type=#{token_type}"}
 
       # create the new Field
       org.apache.lucene.document.Field.new(key.to_s, cvalue, store, token_type ) #org.apache.lucene.document.Field::Index::NO_NORMS)
@@ -90,12 +86,12 @@ module Lucene
         when Date.to_s
           t = Time.utc(value.year, value.month, value.day)
           d = t.to_i * 1000
-          org.apache.lucene.document.DateTools.timeToString(d,org.apache.lucene.document.DateTools::Resolution::DAY )
+          org.Bridge.time_day(d)
         when DateTime.to_s
           # only utc times are supported 
           t = Time.utc(value.year, value.month, value.day, value.hour, value.min, value.sec)
           d = t.to_i * 1000
-          org.apache.lucene.document.DateTools.timeToString(d,org.apache.lucene.document.DateTools::Resolution::SECOND )
+          org.Bridge.time_second(d)
         else value.to_s
         end
       end

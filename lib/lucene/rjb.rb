@@ -1,3 +1,14 @@
+# -------------------------------------------------
+# Stuff to make C Ruby and JRuby a bit more similar
+# TODO maybe we should put this somewhere else - duplicated code !
+#
+class Array
+  def to_java(arg)
+    self
+  end
+end
+
+
 module Lucene
   store = Rjb::import 'org.apache.lucene.document.Field$Store'
   Lucene.const_set(:STORE_YES, store.YES)
@@ -11,7 +22,12 @@ module Lucene
   # org.apache.lucene.search.BooleanClause::Occur::MUST
   boolean_clause = Rjb::import 'org.apache.lucene.search.BooleanClause$Occur'
   Lucene.const_set(:OCCUR_MUST, boolean_clause.MUST)
+  Lucene.const_set(:OCCUR_SHOULD, boolean_clause.SHOULD)
 
   # CRuby with in memory lucene db does not yet work, set default to store on file indexes
   Config.setup.merge!({:store_on_file => true, :storage_path => 'tmp/lucene'})
+
+  resolution = Rjb::import 'org.apache.lucene.document.DateTools$Resolution'
+  Lucene.const_set(:RESOLUTION_DAY, resolution.DAY)
+  Lucene.const_set(:RESOLUTION_SECOND, resolution.SECOND)
 end

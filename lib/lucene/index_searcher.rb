@@ -107,13 +107,18 @@ module Lucene
 
     def parse_field(field)
       case field
-      when String,Symbol
-        [org.apache.lucene.search.SortField.new(field.to_s)]
-      when org.apache.lucene.search.SortField
-        [field]
-      when Array
-        raise StandardError.new("Unknown sort field '#{field}'") unless field.first.kind_of?(org.apache.lucene.search.SortField)
-        field
+        when String, Symbol
+          [org.apache.lucene.search.SortField.new(field.to_s)]
+        when org.apache.lucene.search.SortField
+          [field]
+        when Array
+          raise StandardError.new("Unknown sort field '#{field}'") unless field.first.kind_of?(org.apache.lucene.search.SortField) if defined? JRUBY_VERSION
+          field
+        else
+          # TODO should really be - when org.apache.lucene.search.SortField
+          # but had problem getting === working with RJB so here we just guess it is of type type ...
+          raise "Unknown sort field #{field}" if defined? JRUBY_VERSION
+          [field]
       end
     end
 
@@ -129,7 +134,7 @@ module Lucene
         fields.each do |field|
           sorts += parse_field(field)
         end
-        org.apache.lucene.search.Sort.new(sorts.to_java(:'org.apache.lucene.search.SortField')) 
+        org.Bridge.create_sort(sorts.to_java(:'org.apache.lucene.search.SortField'))
       else
         StandardError.new("Unknown type #{fields.class.to_s}")
       end
