@@ -78,10 +78,10 @@ module Neo4j
         Neo4j.stop
       end
       @neo = neo_instance || start_db
-      @ref_node = Neo4j::Transaction.run do
-        ReferenceNode.new(@neo.getReferenceNode())
-      end
 
+      # TODO, no need to keep a reference here, enough with a singleton in ReferenceNode
+      @ref_node = ReferenceNode.instance
+      
       Neo4j::Transaction.run do
         Neo4j.event_handler.neo_started(self)
       end
@@ -130,7 +130,14 @@ module Neo4j
       node = instance.createNode
       props.each_pair{|k,v| node[k] = v}
       node
-    end
+    end if defined? JRUBY_VERSION
+
+    def create_node(props = {}) # :nodoc:
+      node = instance.createNode
+      props.each_pair{|k,v| node.setProperty(k.to_s,v)}
+      node
+    end unless defined? JRUBY_VERSION
+
 
     # Creates a new Relationship
     # All relationships are created by this method.

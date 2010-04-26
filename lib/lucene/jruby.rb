@@ -1,3 +1,5 @@
+include Java  if defined? JRUBY_VERSION
+
 module Lucene
   # Constants that are specific for JRuby
 

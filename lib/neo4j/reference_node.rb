@@ -10,6 +10,10 @@ module Neo4j
   class ReferenceNode
     include Neo4j::NodeMixin
     include Neo4j::MigrationMixin
+
+    def self.instance
+      @instance ||= Neo4j::Transaction.run { ReferenceNode.new(Neo4j.instance.getReferenceNode()) }
+    end
   end
 
 end

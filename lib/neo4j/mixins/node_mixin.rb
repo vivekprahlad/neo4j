@@ -82,13 +82,9 @@ module Neo4j
     end
 
     def node_given?(node)
-      node.kind_of?(org.neo4j.graphdb.Node)
-    end if defined? JRUBY_VERSION
-
-    def node_given?(node)
-      node.respond_to?(:_classname) && node._classname == "org.neo4j.kernel.impl.core.NodeProxy"  # TODO ugly, must be a better way to make it similar to JRuby kind_of?
-    end unless defined? JRUBY_VERSION
-
+      # TODO rather weak guess, but it is probably a neo4j node if the method getId exists.
+      node.respond_to?(:getId)
+    end
 
     # Inits this node with the specified java neo node
     #
@@ -106,7 +102,7 @@ module Neo4j
     #
     def init_without_node(props) # :nodoc:
       props[:_classname] = self.class.to_s
-      @_java_node = Neo4j.create_node props
+      @_java_node = Neo4j::Node.new props
       update_index if props && !props.empty?
       @_java_node._wrapper = self
       Neo4j.event_handler.node_created(self)

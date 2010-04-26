@@ -20,7 +20,7 @@ module Neo4j::JavaPropertyMixin
 
   # Returns true if this property container has a property accessible through the given key, false otherwise.
   def property?(key)
-    has_property?(key.to_s)
+    hasProperty(key.to_s)
   end
 
   # Returns the given property if it exist or nil if it does not exist.
