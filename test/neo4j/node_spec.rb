@@ -20,12 +20,23 @@ describe Neo4j::Node do
   end
 
   describe "#new" do
-    it "returns an instance of org.neo4j.graphdb.Node" do
-      Neo4j::Transaction.run do
-        # when
-        node = Neo4j::Node.new
-        # then
-        node.should be_kind_of(org.neo4j.graphdb.Node)
+    if defined? JRUBY_VERSION
+      it "returns an instance of org.neo4j.graphdb.Node" do
+        Neo4j::Transaction.run do
+          # when
+          node = Neo4j::Node.new
+          # then
+          node.should be_kind_of(org.neo4j.graphdb.Node)
+        end
+      end
+    else
+      it "returns an instance of Neo4j::Node" do
+        Neo4j::Transaction.run do
+          # when
+          node = Neo4j::Node.new
+          # then
+          node.should be_kind_of(Neo4j::Node)
+        end
       end
     end
 
@@ -189,6 +200,7 @@ describe Neo4j::Node do
 
       # when
       actual = @node.rels.outgoing(:foo).first
+
 
       # then
       expected = @node.getRelationships().iterator.next()

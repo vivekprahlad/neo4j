@@ -82,7 +82,7 @@ module Neo4j
     include Neo4j::JavaNodeMixin
     extend Forwardable
     
-    def_delegators :@rjb_node, :getId, :delete, :setProperty, :hasProperty, :traverse
+    def_delegators :@rjb_node, :getId, :delete, :setProperty, :hasProperty, :traverse, :removeProperty, :hasRelationship, :getPropertyKeys
 
     def initialize(rjb_node)
       @rjb_node = rjb_node
@@ -92,8 +92,20 @@ module Neo4j
       @rjb_node
     end
 
+    def hash
+      @rjb_node.hashCode
+    end
+    
+    def getPropertyKeys
+      k = @rjb_node.getPropertyKeys
+      IteratorConverter.new(k.iterator) do |x|
+        x.toString        
+      end
+    end
+
     def createRelationshipTo(to, java_type)
-      @rjb_node.createRelationshipTo(to._java_node.rjb_node, java_type)
+      r = @rjb_node.createRelationshipTo(to._java_node.rjb_node, java_type)
+      Relationship.new(r)
     end
     
     def self.new(*args)
@@ -110,7 +122,7 @@ module Neo4j
     end
 
     def self.wrap(java_node)
-
+               # TODO remove ???
     end
 
     def has_property?(p)
@@ -135,20 +147,58 @@ module Neo4j
 
     def getRelationships(*args)
       # Match getRelationships()
-      return @rjb_node.getRelationships if args.length == 0
+      rels = if args.length == 0
+        @rjb_node.getRelationships
+      elsif args[0]._classname == "org.neo4j.graphdb.Direction"
+        @rjb_node._invoke('getRelationships', 'Lorg.neo4j.graphdb.Direction;', args[0])
+      else
+        @rjb_node._invoke('getRelationships', 'Lorg.neo4j.graphdb.RelationshipType;Lorg.neo4j.graphdb.Direction;', args[0], args[1])
+      end
 
-#      raise "Called getRelationships on a none Neo4j Node" if self._classname != 'org.neo4j.kernel.impl.core.NodeProxy'
-      # Match getRelationships(Direction dir)
-#      raise "Unknown argument #{args.inspect}, not an RJB thingy" unless args[0].respond_to?(:_classname)
-      return @rjb_node._invoke('getRelationships', 'Lorg.neo4j.graphdb.Direction;', args[0]) if args[0]._classname == "org.neo4j.graphdb.Direction"
-
-      # Match getRelationships(RelationshipType type, Direction dir)
-      raise "Expects two arguments, got #{args.lentgh}" unless args.length == 2
-#      raise "First arg should be org.neo4j.graphdb.DynamicRelationshipType, got '#{args[0]._classname}'" unless args[0]._classname == "org.neo4j.graphdb.DynamicRelationshipType"
-#      raise "Second arg should be org.neo4j.graphdb.Direction, got '#{args[0]._classname}'" unless args[1]._classname == "org.neo4j.graphdb.Direction"
-      @rjb_node._invoke('getRelationships', 'Lorg.neo4j.graphdb.RelationshipType;Lorg.neo4j.graphdb.Direction;', args[0], args[1])
+      IteratorWrapper.new(rels, Neo4j::Relationship)
     end
   end
+
+  class IteratorWrapper # :nodoc:
+    def initialize(iterator, clazz)
+      @iterator = iterator
+      @clazz = clazz
+    end
+
+    def iterator
+      self
+    end
+    
+    def next
+      n = @iterator.next
+      return @clazz.new(n) if n
+    end
+
+    def hasNext
+      @iterator.hasNext
+    end
+  end
+
+  class IteratorConverter # :nodoc:
+    def initialize(iterator, &proc)
+      @iterator = iterator
+      @proc = proc
+    end
+
+    def iterator
+      self
+    end
+
+    def next
+      n = @iterator.next
+      return @proc.call(n) if n
+    end
+
+    def hasNext
+      @iterator.hasNext
+    end
+  end
+
 end
 
 

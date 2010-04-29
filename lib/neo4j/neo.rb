@@ -163,7 +163,7 @@ module Neo4j
        else
         neo_node.wrapper
       end
-    rescue org.neo4j.graphdb.NotFoundException
+    rescue # org.neo4j.graphdb.NotFoundException , TODO ?
       nil
     end
 
@@ -184,7 +184,7 @@ module Neo4j
       else
         neo_rel.wrapper
       end
-    rescue org.neo4j.graphdb.NotFoundException
+    rescue # org.neo4j.graphdb.NotFoundException, TODO ?
       nil
     end
 

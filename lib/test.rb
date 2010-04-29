@@ -1,10 +1,12 @@
 require 'neo4j'
-#Lucene::Config.setup.merge!({:store_on_file => true, :storage_path => '/tmp/foo'})
+Lucene::Config.setup.merge!({:store_on_file => true, :storage_path => '/tmp/foo'})
+
 
 #@index = Lucene::Index.new('myindex')
 #@index.field_infos[:name] = Lucene::FieldInfo.new(:store => true)
+#@index << {:id => '1', :name => 'kalle'}
 #@index.commit
-#result = @index.find(:id=>"1")
+#result = @index.find(:name=>"kalle")
 #
 #puts "Result #{result.size}"
 
@@ -44,7 +46,7 @@ Neo4j::Transaction.finish
 
 Neo4j::Transaction.run do
 
-  people = PersonX.find(:name => 'p1')
+  people = PersonX.find(:name => 'p2')
   p1 = people[0]
   puts "Found #{p1[:name]}"
 end
