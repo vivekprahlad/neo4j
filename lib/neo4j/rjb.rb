@@ -11,7 +11,7 @@ end
 
 java.lang.String.new.class.class_eval do
   def wrapper
-    case self._classname
+    @_wrapper = case self._classname
       when 'org.neo4j.kernel.impl.core.NodeProxy'
         Neo4j::Node.new(self)
       when  'org.neo4j.kernel.impl.core.RelationshipProxy'
@@ -19,7 +19,24 @@ java.lang.String.new.class.class_eval do
       else
         raise "Unknown class #{self._classname}"
     end
+
+    puts "WRAPPER #@_wrapper"
+    puts "CLASSNAME #{getProperty('_classname')}" if wrapper?
+    @_wrapper = wrapper_class.new(@_wrapper) if wrapper?
+    @_wrapper
   end
+
+  def wrapper?
+    hasProperty('_classname')
+  end
+
+  def wrapper_class  # :nodoc:
+    classname = getProperty('_classname')
+    classname.split("::").inject(Kernel) do |container, name|
+      container.const_get(name.to_s)
+    end
+  end
+
 end
 
 # Extend Neo4j
@@ -41,27 +58,58 @@ module Neo4j
     end
   end
 
+  module RjbPropertyMixin
+    def getPropertyKeys
+      k = @rjb_obj.getPropertyKeys
+      IteratorConverter.new(k.iterator) do |x|
+        x.toString
+      end
+    end
+
+    def has_property?(p)
+      hasProperty(p)
+    end
+
+    def getProperty(k)
+      value = @rjb_obj.getProperty(k)
+      case value._classname
+        when "java.lang.Integer" then
+          value.intValue
+        when "java.lang.String" then
+          value.toString
+        when "java.lang.Double" then
+          value.doubleValue
+        when "java.lang.Boolean" then
+          value.booleanValue
+        else
+          raise "TODO unknown type '#{value._classname}'"
+      end
+    end
+  end
+
+
   class Relationship
     include Neo4j::JavaPropertyMixin
     include Neo4j::JavaRelationshipMixin
+    include RjbPropertyMixin
     extend Forwardable
 
-    def_delegators :@rjb_rel, :getId, :delete, :setProperty, :hasProperty, :getType
+    def_delegators :@rjb_obj, :getId, :delete, :setProperty, :hasProperty, :getType
 
     def initialize(rjb_node)
-      @rjb_rel = rjb_node
+      @rjb_obj = rjb_node
     end
 
     def getStartNode
-      @rjb_rel.getStartNode.wrapper
+      @rjb_obj.getStartNode.wrapper
     end
 
     def getEndNode
-      @rjb_rel.getEndNode.wrapper
+      @rjb_obj.getEndNode.wrapper
     end
 
     def getOtherNode(other)
-      @rjb_rel.getOtherNode(other._java_node.rjb_node)      
+      @rjb_obj.getOtherNode(other._java_node.rjb_node)      
     end
 
 
@@ -80,31 +128,26 @@ module Neo4j
     include Neo4j::JavaPropertyMixin
     include Neo4j::JavaListMixin
     include Neo4j::JavaNodeMixin
+    include RjbPropertyMixin
     extend Forwardable
     
-    def_delegators :@rjb_node, :getId, :delete, :setProperty, :hasProperty, :traverse, :removeProperty, :hasRelationship, :getPropertyKeys
+    def_delegators :@rjb_obj, :getId, :delete, :setProperty, :hasProperty, :traverse, :removeProperty, :hasRelationship
 
     def initialize(rjb_node)
-      @rjb_node = rjb_node
+      @rjb_obj = rjb_node
     end
 
     def rjb_node
-      @rjb_node
+      @rjb_obj
     end
 
     def hash
-      @rjb_node.hashCode
+      @rjb_obj.hashCode
     end
     
-    def getPropertyKeys
-      k = @rjb_node.getPropertyKeys
-      IteratorConverter.new(k.iterator) do |x|
-        x.toString        
-      end
-    end
 
     def createRelationshipTo(to, java_type)
-      r = @rjb_node.createRelationshipTo(to._java_node.rjb_node, java_type)
+      r = @rjb_obj.createRelationshipTo(to._java_node.rjb_node, java_type)
       Relationship.new(r)
     end
     
@@ -121,38 +164,20 @@ module Neo4j
       end
     end
 
-    def self.wrap(java_node)
-               # TODO remove ???
-    end
 
-    def has_property?(p)
-      hasProperty(p)
+    def getSingleRelationship(type,dir)
+      r = @rjb_obj.getSingleRelationship(type,dir)
+      Neo4j::Relationship.new(r)
     end
-
-    def getProperty(k)
-      value = @rjb_node.getProperty(k)
-      case value._classname
-        when "java.lang.Integer" then
-          value.intValue
-        when "java.lang.String" then
-          value.toString
-        when "java.lang.Double" then
-          value.doubleValue
-        when "java.lang.Boolean" then
-          value.booleanValue
-        else
-          raise "TODO unknown type '#{value._classname}'"
-      end
-    end
-
+    
     def getRelationships(*args)
       # Match getRelationships()
       rels = if args.length == 0
-        @rjb_node.getRelationships
+        @rjb_obj.getRelationships
       elsif args[0]._classname == "org.neo4j.graphdb.Direction"
-        @rjb_node._invoke('getRelationships', 'Lorg.neo4j.graphdb.Direction;', args[0])
+        @rjb_obj._invoke('getRelationships', 'Lorg.neo4j.graphdb.Direction;', args[0])
       else
-        @rjb_node._invoke('getRelationships', 'Lorg.neo4j.graphdb.RelationshipType;Lorg.neo4j.graphdb.Direction;', args[0], args[1])
+        @rjb_obj._invoke('getRelationships', 'Lorg.neo4j.graphdb.RelationshipType;Lorg.neo4j.graphdb.Direction;', args[0], args[1])
       end
 
       IteratorWrapper.new(rels, Neo4j::Relationship)

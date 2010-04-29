@@ -167,7 +167,6 @@ module Neo4j
       nil
     end
 
-
     # Return a Neo4j relationship.
     #
     # ==== Parameters

@@ -35,7 +35,6 @@ module Neo4j
 
     # Returns the first item in the search result
     #
-    # :api: public
     def first
       return nil if empty?
       self[0]
