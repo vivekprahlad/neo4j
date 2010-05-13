@@ -8,9 +8,71 @@ class Array
   end
 end
 
+class Object
+  def method_missing(m, * args, & block)
+   puts "Method missing for #{self._classname}"
+   puts "Method #{m}, args #{args.inspect}"
 
+  end
+end
+
+def override_after(obj, u_meth, m, &p)
+  puts "OVERRIDE #{m}"
+
+  begin
+    u_meth.bind(obj).call(m, args)
+  rescue
+    puts "Not available"
+  end
+
+end
+
+java.lang.Object.new.class.class_eval do
+
+  overrides = {:toString => Proc.new { puts "HOHO"; k = yield; puts "---K = #{k}"}}
+
+#  methods.sort.each {|x| puts "METHOD #{x}"}
+#  instance_variables.sort.each {|x| puts "VAR #{x}"}
+  k = instance_method(:method_missing)
+
+  puts "K = #{k}"
+  define_method(:method_missing) do |m, *args|
+    puts "KALLE2 #{m.class}, #{m}, #{args.inspect}"
+    puts "MEMBER #{(overrides.member?(m))}"
+    s = self
+    begin
+      overrides[m].call do
+        puts "CALL METHOD #{m} on #{s}"
+        #k.bind(s).call(m, args)
+      end if (overrides.member?(m))
+      #k.bind(self).call(m, args)
+    rescue
+      puts "Not available"      
+    end
+  end
+  
+  def method_missing2(m, *args, &block)
+    puts "Method missing for #{self._classname}"
+    puts "Method #{m}, args #{args.inspect}"
+  end
+end
+
+puts java.lang.String.new('asd').toString #kalle2(1,2,3)
+exit
 java.lang.String.new.class.class_eval do
-  def wrapper
+  #alias_method :orig_method_missing, :method_missing
+
+  methods.sort.each {|x| puts "METHOD #{x}"}
+  instance_variables.sort.each {|x| puts "VAR #{x}"}
+  
+  def method_missing2(m, *args, &block)
+#    puts "Method missing for #{self._classname}"
+#    puts "Method #{m}, args #{args.inspect}"
+    #orig_method_missing(m, args, &block)
+    super
+  end
+
+  def wrapper2
     @_wrapper = case self._classname
       when 'org.neo4j.kernel.impl.core.NodeProxy'
         Neo4j::Node.new(self)
