@@ -90,9 +90,6 @@ module Neo4j
       nil
     end
 
-    def start_db # :nodoc:
-      org.neo4j.kernel.EmbeddedGraphDatabase.new(Neo4j::Config[:storage_path])      
-    end
 
 
 
@@ -130,14 +127,7 @@ module Neo4j
       node = instance.createNode
       props.each_pair{|k,v| node[k] = v}
       node
-    end if defined? JRUBY_VERSION
-
-    def create_node(props = {}) # :nodoc:
-      node = instance.createNode
-      props.each_pair{|k,v| node.setProperty(k.to_s,v)}
-      node
-    end unless defined? JRUBY_VERSION
-
+    end
 
     # Creates a new Relationship
     # All relationships are created by this method.
@@ -157,7 +147,7 @@ module Neo4j
     # The node object or nil if not found
     #
     def load_node(node_id, raw = false)
-      neo_node = @neo.getNodeById(node_id.to_i)
+      neo_node = instance.getNodeById(node_id.to_i)
       if (raw)
         neo_node
        else
@@ -177,7 +167,7 @@ module Neo4j
     # The node object or nil if not found
     #
     def load_rel(rel_id, raw = false)
-      neo_rel = @neo.getRelationshipById(rel_id.to_i)
+      neo_rel = instance.getRelationshipById(rel_id.to_i)
       if (raw)
         neo_rel
       else

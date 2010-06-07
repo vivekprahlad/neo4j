@@ -101,7 +101,9 @@ module Neo4j
     # Creates a new node and initialize with given properties.
     #
     def init_without_node(props) # :nodoc:
+      puts "props #{props}"
       props[:_classname] = self.class.to_s
+      puts "Set propes #{props}"
       @_java_node = Neo4j::Node.new props
       update_index if props && !props.empty?
       @_java_node._wrapper = self

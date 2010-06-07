@@ -1,6 +1,8 @@
 module Neo4j
 
 
+
+  
   # A node in the graph with properties and relationships to other entities.
   # Along with relationships, nodes are the core building blocks of the Neo4j data representation model. 
   # Nodes are created by invoking the Neo4j::Node.new method.
@@ -17,6 +19,28 @@ module Neo4j
   # See also the Neo4j::NodeMixin if you want to wrap a node with your own Ruby class.
   #
   class Node
+    class << self
+      # Returns a org.neo4j.graphdb.Node java object (!)
+      # Will trigger a event that the node was created.
+      #
+      # === Parameters
+      # *args :: can be a hash of properties to initialize the node with or empty
+      #
+      # === Returns
+      # org.neo4j.graphdb.Node java object
+      #
+      # === Examples
+      #
+      #  Neo4j::Node.new
+      #  Neo4j::Node.new :name => 'foo', :age => 100
+      #
+      def new(*args)
+        node = Neo4j.create_node(args[0] || {})
+        yield node if block_given?
+        Neo4j.event_handler.node_created(node)
+        node
+      end
+    end
   end
 
 end

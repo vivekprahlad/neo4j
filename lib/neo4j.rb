@@ -5,14 +5,19 @@ require 'delegate'
 require 'forwardable'
 
 # rjb_ext is needed to setup the classpath for the RJB CRuby JARs
-require 'rjb_ext' unless defined? JRUBY_VERSION
+#require 'rjb_ext' unless defined? JRUBY_VERSION # now included in rjb 1.2.2
 
 # external jars
+
+unless defined? JRUBY_VERSION
+  require 'rjb'
+  require 'rjbextension'
+end
+
 require 'neo4j/jars'
 
 # lucene
 require 'lucene'
-
 
 
 # config

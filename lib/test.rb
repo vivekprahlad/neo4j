@@ -12,7 +12,7 @@ Lucene::Config.setup.merge!({:store_on_file => true, :storage_path => '/tmp/foo'
 
 #exit
 
-Neo4j.start
+Neo4j.start                                                     
 Neo4j::Transaction.new
 a = Neo4j::Node.new
 b = Neo4j::Node.new :name => 'b'
@@ -27,7 +27,6 @@ class PersonX
   has_n :friends
   property :name
   index :name
-  
 end
 
 p1 = PersonX.new :name => 'p1'
