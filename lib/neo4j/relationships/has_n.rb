@@ -49,11 +49,11 @@ module Neo4j
       #  morpheus.friends.depth(3).each { ... }
       #  
       # ==== Arguments
-      # d<Fixnum,Symbol>:: the depth or :all if traversing to the end of the network.
+      # d:: the depth or :all if traversing to the end of the network (Fixnum or Symbol).
+      #
       # ==== Return
       # self
       # 
-      # :api: public
       def depth(d)
         @traverser.depth(d)
         self

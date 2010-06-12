@@ -39,7 +39,6 @@ module Neo4j
       # ==== Return
       # self
       #
-      # :api: public
       def depth(d)
         if d == :all
           @stop_evaluator = Neo4j::END_OF_GRAPH

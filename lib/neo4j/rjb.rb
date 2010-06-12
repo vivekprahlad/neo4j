@@ -31,8 +31,6 @@ module Neo4j
         rel = super
         rel.instance_eval do
           include Neo4j::JavaPropertyMixin
-          include Neo4j::JavaNodeMixin
-          include Neo4j::JavaListMixin
           include Neo4j::RjbPropertyMixin
           Neo4j::rjb_extend_node(self, %w[  getStartNode getEndNode getOtherNode  ])
         end
@@ -46,9 +44,7 @@ module Neo4j
       self;
     end
     methods.each do |meth|
-      puts "Define #{meth}"
       meta.send :define_method, meth.to_sym do
-        puts "Proxy #{meth} for #{self}"
         node = super
         node.instance_eval do
           include Neo4j::JavaPropertyMixin
@@ -106,7 +102,7 @@ module Neo4j
 
   module RjbNodeMixin
 
-    def getRelationships(* args)
+    def getRelationships(*args)
       iter = if args.length == 0
         super
       elsif args[0]._classname == "org.neo4j.graphdb.Direction"
@@ -114,8 +110,11 @@ module Neo4j
       else
         self._invoke('getRelationships', 'Lorg.neo4j.graphdb.RelationshipType;Lorg.neo4j.graphdb.Direction;', args[0], args[1])
       end
+      IteratorWrapper.new(iter)
+    end
 
-      puts "Extend iter ?"
+    def traverse(order, stop_eval, ret_eval, types_and_dirs)
+      iter = super
       IteratorWrapper.new(iter)
     end
   end
