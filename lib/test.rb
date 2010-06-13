@@ -2,6 +2,8 @@ require 'neo4j'
 Lucene::Config.setup.merge!({:store_on_file => true, :storage_path => '/tmp/foo'})
 
 
+
+
 #@index = Lucene::Index.new('myindex')
 #@index.field_infos[:name] = Lucene::FieldInfo.new(:store => true)
 #@index << {:id => '1', :name => 'kalle'}
@@ -17,7 +19,11 @@ Neo4j::Transaction.new
 a = Neo4j::Node.new
 b = Neo4j::Node.new :name => 'b'
 a[:name] = 'a'
-
+class Foo
+  def kalle
+    puts "kalle"
+  end
+end
 
 a.rels.outgoing(:friends) << b
 a.rels.each {|x| puts "Rel #{x.getEndNode[:name]}"}
@@ -25,12 +31,15 @@ a.rels.each {|x| puts "Rel #{x.getEndNode[:name]}"}
 class PersonX
   include Neo4j::NodeMixin
   has_n :friends
-  property :name
+  property :name, :type => Object
   index :name
 end
 
-p1 = PersonX.new :name => 'p1'
+p1 = PersonX.new
+p1.name = Foo.new
+exit
 p2 = PersonX.new :name => 'p2'
+
 
 puts p1.name
 puts p2.name

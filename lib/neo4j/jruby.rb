@@ -31,5 +31,16 @@ module Neo4j
     include Neo4j::JavaNodeMixin
     include Neo4j::JavaListMixin
   end
-  
+
+
+  module NodeMixin
+    def set_and_marshal_property(key, value)
+      setProperty(key, Marshal.dump(value).to_java_bytes)
+    end
+
+    def get_and_marshal_property(key)
+      Marshal.load(String.from_java_bytes(getProperty(key.to_s)))
+    end
+
+  end
 end

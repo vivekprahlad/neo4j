@@ -67,6 +67,15 @@ module Neo4j
   end
 
   module RjbPropertyMixin
+
+    def kind_of?(other)
+      other.respond_to?(:_classname) && other._classname == 'java.lang.Class' && other.isInstance(self)
+    end
+
+    def hash
+      self.hashCode
+    end
+    
     def getPropertyKeys
       k = super
       IteratorConverter.new(k.iterator) do |x|
@@ -97,8 +106,21 @@ module Neo4j
           raise "TODO unknown type '#{value._classname}'"
       end
     end
+
   end
 
+  module NodeMixin
+    def set_and_marshal_property(key, value)
+      bytes = []
+      Marshal.dump(value).each_byte {|bb| bytes << bb}
+      org.NeoBridge.setProperty(@_java_node, key.to_s, bytes)
+    end
+
+    def get_and_marshal_property(key)
+      bytes = org.NeoBridge.getProperty(@_java_node, key.to_s)
+      Marshal.load(bytes)
+    end
+  end
 
   module RjbNodeMixin
 

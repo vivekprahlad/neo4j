@@ -26,8 +26,8 @@ module Neo4j::JavaPropertyMixin
   # Returns the given property if it exist or nil if it does not exist.
   def [](key)
     return unless property?(key)
-    if @_wrapper and @_wrapper.class.marshal?(key)
-      Marshal.load(String.from_java_bytes(getProperty(key.to_s)))
+    if @_wrapper && @_wrapper.class.marshal?(key)
+      @_wrapper.get_and_marshal_property(key)
     else
       getProperty(key.to_s)
     end
@@ -43,7 +43,7 @@ module Neo4j::JavaPropertyMixin
     if value.nil?
       delete_property(k)
     elsif @_wrapper and @_wrapper.class.marshal?(key)
-      setProperty(k, Marshal.dump(value).to_java_bytes)
+      @_wrapper.set_and_marshal_property(key, value)
     else
       value = java.lang.Double.new(value) if value.is_a? Float
       setProperty(k, value)
