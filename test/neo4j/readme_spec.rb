@@ -304,7 +304,7 @@ describe "Readme Examples" do
     end
 
     it "Accessing the Java Neo4j API" do
-      Neo4j.instance.java_class.should == org.neo4j.kernel.EmbeddedGraphDatabase.java_class
+      Neo4j.instance.should be_kind_of(org.neo4j.kernel.EmbeddedGraphDatabase)
       Neo4j::Node.new.should be_kind_of(org.neo4j.graphdb.Node)
 
       a = Neo4j::Node.new

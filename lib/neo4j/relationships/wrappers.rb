@@ -9,9 +9,14 @@ module Neo4j
       def initialize(proc, raw = false)
         @proc = proc
         @raw = raw
-        Rjb::bind(self, 'org.neo4j.graphdb.ReturnableEvaluator') unless defined? JRUBY_VERSION
       end
 
+      unless defined? JRUBY_VERSION
+        def self.new(proc, raw = false)
+           re = super 
+           Rjb::bind(re, 'org.neo4j.graphdb.ReturnableEvaluator')
+        end
+      end
       def isReturnableNode( traversal_position )
         # if the Proc takes one argument that we give it the traversal_position
         result = if @proc.arity == 1
@@ -33,7 +38,6 @@ module Neo4j
     # Wrapper for the neo4j org.neo4j.graphdb.StopEvalutor interface.
     # Used in the Neo4j Traversers.
     #
-    # :api: private
     class DepthStopEvaluator #:nodoc:
       include org.neo4j.graphdb.StopEvaluator if defined? JRUBY_VERSION
 

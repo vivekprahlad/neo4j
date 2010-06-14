@@ -99,7 +99,6 @@ module Neo4j
       # ==== Returns
       # self
       #
-      # :api: public
       def <<(other)
         create_rel(@node, other)
         self
