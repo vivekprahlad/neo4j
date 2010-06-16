@@ -78,7 +78,7 @@ module Neo4j
         iter = iterator
         while (iter.hasNext) do
           n = iter.next
-          yield Neo4j.load_node(n.get_id)
+          yield Neo4j.load_node(n.getId)
         end
       end
 

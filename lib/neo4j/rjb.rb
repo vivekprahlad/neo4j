@@ -52,17 +52,31 @@ module Neo4j
           include Neo4j::JavaListMixin
           include Neo4j::RjbPropertyMixin
           include Neo4j::RjbNodeMixin
+          Neo4j::rjb_extend_rel(self, %w[  createRelationshipTo  ])
+          Neo4j::rjb_extend_iterator(self, %w[traverse])
         end
         node
       end
     end
   end
 
+  def self.rjb_extend_iterator(obj, methods)
+    meta = class << obj;
+      self;
+    end
+
+    methods.each do |meth|
+      meta.send :define_method, meth.to_sym do
+        IteratorWrapper.for_nodes(super)
+      end
+    end
+  end
+  
   def self.start_db # :nodoc:
     db = org.neo4j.kernel.EmbeddedGraphDatabase.new(Neo4j::Config[:storage_path])
-    rjb_extend_node(db, %w[   createNode getNodeById getReferenceNode   ])
-    rjb_extend_rel(db, %w[  getRelationshipById  ])
-    #@neo.getRelationshipById(rel_id.to_i)
+    rjb_extend_node(db, %w[createNode getNodeById getReferenceNode])
+    rjb_extend_rel(db, %w[getRelationshipById])
+    rjb_extend_iterator(db, %w[getAllNodes])
     db
   end
 
@@ -132,23 +146,30 @@ module Neo4j
       else
         self._invoke('getRelationships', 'Lorg.neo4j.graphdb.RelationshipType;Lorg.neo4j.graphdb.Direction;', args[0], args[1])
       end
-      IteratorWrapper.new(iter)
+      IteratorWrapper.for_rels(iter)
     end
 
-    def traverse(order, stop_eval, ret_eval, types_and_dirs)
-      iter = super
-      IteratorWrapper.new(iter)
-    end
   end
 
   class IteratorWrapper # :nodoc:
+    attr_reader :iterator
+
+    private
     def initialize(iterator)
       @iterator = iterator
-      Neo4j::rjb_extend_rel(@iterator, %w[next])
     end
 
-    def iterator
-      self
+    public
+    def self.for_nodes(iterable)
+      iter = iterable.iterator
+      Neo4j::rjb_extend_node(iter, %w[next])
+      new(iter)
+    end
+
+    def self.for_rels(iterable)
+      iter = iterable.iterator
+      Neo4j::rjb_extend_rel(iter, %w[next])
+      new(iter)
     end
 
     def next
@@ -158,6 +179,7 @@ module Neo4j
     def hasNext
       @iterator.hasNext
     end
+
   end
 
   class IteratorConverter # :nodoc:

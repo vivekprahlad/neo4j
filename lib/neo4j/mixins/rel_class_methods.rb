@@ -3,14 +3,14 @@ module Neo4j::RelClassMethods
 
   # Contains information of all relationships, name, type, and multiplicity
   #
-  # :api: private
   def decl_relationships # :nodoc:
     self::DECL_RELATIONSHIPS
   end
 
 
   # Specifies a relationship between two node classes.
-  # Generates assignment and accessor methods for the given relationship
+  # Generates assignment and accessor methods for the given relationship.
+  # If one relationship already exist then it will be deleted.
   #
   # ==== Example
   #

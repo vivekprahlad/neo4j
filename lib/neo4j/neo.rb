@@ -188,7 +188,7 @@ module Neo4j
     #   Neo4j.all_nodes{|node| puts "Node id ${node.neo_id"}
     #
     def all_nodes(raw = false)
-      iter = instance.all_nodes.iterator
+      iter = instance.getAllNodes().iterator
       while (iter.hasNext)
         id = iter.next.neo_id
         yield load_node(id, raw)

@@ -54,7 +54,7 @@ module Neo4j::JavaRelationshipMixin
   # the relationship type (of type Symbol)
   #
   def relationship_type
-    get_type.name.to_sym
+    getType.name.to_sym
   end
 
 end

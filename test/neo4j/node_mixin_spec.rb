@@ -158,27 +158,3 @@ describe Neo4j::NodeMixin do
 
 end
 
-
-class DelegateTest
-  include Neo4j::NodeMixin
-end
-
-DELEGATE = %w<[]= [] property? props update neo_id rels rel rel?>
-DELEGATE.each do |del|
-  describe Neo4j::NodeMixin, "##{del}" do
-    before(:each) do
-      @mock = mock("java_node")
-      @mock.should_receive(:kind_of?).and_return(true)
-      @mock.should_receive(:_wrapper=).with(any_args())
-      @node = DelegateTest.new(@mock)
-    end
-
-    it "should be forwarded to Neo4j::JavaPropertyMixin##{del}" do
-      @mock.should_receive(del.to_sym)
-      args = [del.to_sym] + (0..@node.method(del.to_sym).arity).to_a
-      @node.send *args
-    end
-  end
-end
-
-

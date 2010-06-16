@@ -176,7 +176,6 @@ module Neo4j
     end
 
     def update_document(document, node)
-      puts "Hojo"
       relationships = node.rels.both(@rel_type).nodes
       relationships.each do |other_node|
         @properties.each do |p|
