@@ -5,7 +5,11 @@ module Neo4j
   module Load
     def wrapper(node) # :nodoc:
       return node unless node.property?(:_classname)
-      to_class(node[:_classname]).load_wrapper(node)
+      existing_instance = Neo4j::IdentityMap.instance.load(node)
+      return existing_instance if existing_instance
+      new_instance = to_class(node[:_classname]).load_wrapper(node)
+      Neo4j::IdentityMap.instance.store(node, new_instance)
+      new_instance
     end
 
     def to_class(class_name) # :nodoc:
